@@ -1,13 +1,11 @@
 ﻿using FunWithPosts.Model;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FunWithPosts
 {
+    /// <summary>
+    /// Класс контроллера постов
+    /// </summary>
     internal class PostsController
     {
         private readonly int _fromNumber;
@@ -22,6 +20,10 @@ namespace FunWithPosts
             _stringUri = stringUri;
         }
 
+        /// <summary>
+        /// Метод возвращает коллекцию постов
+        /// </summary>
+        /// <returns></returns>
         internal async Task<IEnumerable<Post>> GetPostsAsync()
         {
             List<Post> posts = new();
@@ -45,6 +47,11 @@ namespace FunWithPosts
             return posts;
         }
 
+        /// <summary>
+        /// Метод получает пост по идентификатору
+        /// </summary>
+        /// <param name="i"></param>
+        /// <returns></returns>
         private async Task<Post> GetPostAsync(int i)
         {
             var currentStringUri = $"{_stringUri}/{i}";

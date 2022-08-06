@@ -1,15 +1,16 @@
 ﻿using FunWithPosts.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.IO;
 
 namespace FunWithPosts
 {
+    /// <summary>
+    /// Класс для работы с файлом
+    /// </summary>
     internal static class FileOperations
     {
+        /// <summary>
+        /// Метод записывает коллекцию постов в файл
+        /// </summary>
         public static void WriteToFile(IEnumerable<Post> posts)
         {
             StringBuilder sb = new StringBuilder();
