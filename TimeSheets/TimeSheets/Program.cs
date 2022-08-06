@@ -1,3 +1,8 @@
+using TimeSheets.Data.Implementation;
+using TimeSheets.Data.Interfaces;
+using TimeSheets.Services.Implementation;
+using TimeSheets.Services.Interfaces;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -6,6 +11,14 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+//builder.Services.AddScoped<ISheetRepo, SheetRepo>();
+
+builder.Services.AddSingleton<IUserRepo, UserRepo>();
+
+//builder.Services.AddScoped<ISheetManager, SheetManager>();
+
+builder.Services.AddScoped<IUserManager, UserManager>();
 
 var app = builder.Build();
 
