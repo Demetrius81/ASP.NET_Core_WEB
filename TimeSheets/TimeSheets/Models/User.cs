@@ -1,7 +1,7 @@
 ﻿namespace TimeSheets.Models
 {
     /// <summary>
-    /// Класс пользователь
+    /// Информация о пользователе
     /// </summary>
     public class User
     {
