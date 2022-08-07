@@ -19,17 +19,27 @@ namespace TimeSheets.Services.Implementation
             User user = new User()
             {
                 Id = Guid.NewGuid(),
-                UserName = request.UserName
+                UserName = request.UserName,
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                Email = request.Email,
+                Company = request.Company,
+                Age = request.Age
             };
 
-            _userRepo.Add(user);
+            bool flag = _userRepo.Add(user);
 
-            return user.Id;
+            if (flag)
+            {
+                return user.Id;
+            }
+
+            return default;
         }
 
-        public void DeleteItem(Guid id)
+        public bool DeleteItem(Guid id)
         {
-            _userRepo.Remove(id);
+            return _userRepo.Remove(id);
         }
 
         public User GetItem(Guid id)
@@ -47,11 +57,29 @@ namespace TimeSheets.Services.Implementation
             return _userRepo.GetItems(skip, take);
         }
 
-        public void UpdateItem(UserRequest request)
+        public bool UpdateItem(UserRequest request)
         {
-            User? user = _userRepo.GetItems().FirstOrDefault(x => x.UserName == request.UserName);
+            User? userFromDb = _userRepo.GetItems().FirstOrDefault(x => x.UserName == request.UserName);
 
+            if (userFromDb == null)
+            {
+                return false;
+            }
 
+            User user = new User()
+            {
+                Id = userFromDb.Id,
+                UserName = request.UserName,
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                Email = request.Email,
+                Company = request.Company,
+                Age = request.Age
+            };
+
+            bool flag = _userRepo.Update(user);
+
+            return flag;
         }
     }
 }

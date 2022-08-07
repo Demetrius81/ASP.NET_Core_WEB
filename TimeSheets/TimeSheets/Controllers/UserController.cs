@@ -18,13 +18,9 @@ namespace TimeSheets.Controllers
 
         [HttpPost("add")]
         public IActionResult Add([FromBody] UserRequest request)
-        {
-            Guid response = default;
-
-            if (request is not null)
-            {
-                response = _userManager.AddItem(request);
-            }
+        { 
+            Guid response = _userManager.AddItem(request);
+           
 
             if (response == default)
             {
@@ -71,6 +67,32 @@ namespace TimeSheets.Controllers
             }
 
             return Ok(user);
+        }
+
+        [HttpPut("delete/{id:guid}")]
+        public IActionResult Update([FromBody] UserRequest request)
+        {
+            bool flag = _userManager.UpdateItem(request);
+
+            if (flag)
+            {
+                return Ok();
+            }
+
+            return BadRequest();
+        }
+
+        [HttpDelete("delete/{id:guid}")]
+        public IActionResult Delete([FromRoute] Guid id)
+        {
+            bool flag = _userManager.DeleteItem(id);
+
+            if (flag)
+            {
+                return Ok();
+            }
+
+            return BadRequest();
         }
     }
 }

@@ -7,8 +7,8 @@ namespace TimeSheets.Data.Interfaces
         T GetItem(Guid id);
         IEnumerable<T> GetItems();
         IEnumerable<T> GetItems(int skip, int take);
-        void Add(T Item);
-        void Update(Guid id, T item);
-        void Remove(Guid id);
+        bool Add(T Item);
+        bool Update(T item);
+        bool Remove(Guid id);
     }
 }

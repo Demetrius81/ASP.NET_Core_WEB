@@ -5,7 +5,14 @@ namespace TimeSheets.Data.Implementation
 {
     public class SheetRepo : ISheetRepo
     {
-        public void Add(Sheet Item)
+        private readonly TempData _instance;
+
+        public SheetRepo(TempData instance)
+        {
+            _instance = instance;
+        }
+
+        public bool Add(Sheet Item)
         {
             throw new NotImplementedException();
         }
@@ -25,12 +32,12 @@ namespace TimeSheets.Data.Implementation
             throw new NotImplementedException();
         }
 
-        public void Remove(Guid id)
+        public bool Remove(Guid id)
         {
             throw new NotImplementedException();
         }
 
-        public void Update(Guid id, Sheet item)
+        public bool Update(Sheet item)
         {
             throw new NotImplementedException();
         }

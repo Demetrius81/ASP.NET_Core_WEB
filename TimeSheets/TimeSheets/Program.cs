@@ -1,3 +1,4 @@
+using TimeSheets.Data;
 using TimeSheets.Data.Implementation;
 using TimeSheets.Data.Interfaces;
 using TimeSheets.Services.Implementation;
@@ -14,7 +15,9 @@ builder.Services.AddSwaggerGen();
 
 //builder.Services.AddScoped<ISheetRepo, SheetRepo>();
 
-builder.Services.AddSingleton<IUserRepo, UserRepo>();
+builder.Services.AddSingleton(typeof(TempData));   //Temprary item
+
+builder.Services.AddScoped<IUserRepo, UserRepo>();
 
 //builder.Services.AddScoped<ISheetManager, SheetManager>();
 

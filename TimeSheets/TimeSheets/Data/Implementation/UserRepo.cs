@@ -5,105 +5,85 @@ namespace TimeSheets.Data.Implementation
 {
     public class UserRepo : IUserRepo
     {
-        private List<User> _instance = new List<User>()
-        {
-            new User()
-            {
-                Id = Guid.Parse("5824A045-0AEC-F785-D21D-71ABE298F4A9"),
-                UserName = "Quinlan"
-            },
-            new User()
-            {
-                Id = Guid.Parse("10197B7E-C6B9-960A-E7F3-731577591016"),
-                UserName = "Giacomo"
-            },
-            new User()
-            {
-                Id = Guid.Parse("B9E27F57-B214-1DBA-B51B-BB9ADB03C338"),
-                UserName = "Kelly"
-            },
-            new User()
-            {
-                Id = Guid.Parse("BB6A545E-1902-73A6-FCA5-1B82A71683A9"),
-                UserName = "Megan"
-            },
-            new User()
-            {
-                Id = Guid.Parse("C655B78C-45B0-3433-D38A-42A6918DB8E4"),
-                UserName = "Tamekah"
-            },
-            new User()
-            {
-                Id = Guid.Parse("C8382A98-C3BB-54A0-92A8-1E6B563ABDCB"),
-                UserName = "Hamilton"
-            },
-            new User()
-            {
-                Id = Guid.Parse("EEC3D70A-5E41-869D-B105-E1FCCE25E55A"),
-                UserName = "Blossom"
-            },
-            new User()
-            {
-                Id = Guid.Parse("FB0A5D1D-C122-D69E-433F-9C12EC99AFBF"),
-                UserName = "Zahir"
-            },
-            new User()
-            {
-                Id = Guid.Parse("11DC0EA3-0F47-EB35-4134-66B50E25944A"),
-                UserName = "Yuri"
-            }
-        };
+        private readonly TempData _instance;
 
-        public void Add(User Item)
+        public UserRepo(TempData instance)
         {
-            _instance.Add(Item);
+            _instance = instance;
+        }
+
+        public bool Add(User Item)
+        {
+            if (Item == null)
+            {
+                return false;
+            }
+
+            _instance.users.Add(Item);
+
+            return true;
         }
 
         public User GetItem(Guid id)
         {
-            return _instance.FirstOrDefault(x => x.Id == id);
+            return _instance.users.FirstOrDefault(x => x.Id == id);
         }
 
         public IEnumerable<User> GetItems()
         {
-            return _instance;
+            return _instance.users;
         }
 
         public IEnumerable<User> GetItems(int skip, int take)
         {
-            if (skip >= _instance.Count)
+            if (skip >= _instance.users.Count)
             {
                 return null;
             }
 
-            if ((skip + take) > _instance.Count)
+            if ((skip + take) > _instance.users.Count)
             {
-                take = _instance.Count - skip;
+                take = _instance.users.Count - skip;
             }
 
             return GetSomeItems(skip, take);
         }
 
-        public void Remove(Guid id)
+        public bool Remove(Guid id)
         {
-            User? user = _instance.FirstOrDefault(x => x.Id == id);
+            User? user = _instance.users.FirstOrDefault(x => x.Id == id);
 
             if (user is not null)
             {
-                _instance.Remove(user);
+                _instance.users.Remove(user);
+
+                return true;
             }
+
+            return false;
         }
 
-        public void Update(Guid id, User item)
+        public bool Update(User item)
         {
-            throw new NotImplementedException();
+            User? user = _instance.users.FirstOrDefault(x => x.Id == item.Id);
+
+            if (user == null)
+            {
+                return false;
+            }
+
+            _instance.users.Remove(user);
+
+            _instance.users.Add(item);
+
+            return true;
         }
 
         private IEnumerable<User> GetSomeItems(int skip, int take)
         {
             for (int i = skip; i < skip + take; i++)
             {
-                yield return _instance[i + 1];
+                yield return _instance.users[i + 1];
             }
         }
     }

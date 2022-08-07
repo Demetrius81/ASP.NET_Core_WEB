@@ -5,7 +5,14 @@ namespace TimeSheets.Data.Implementation
 {
     public class ContractRepo : IContractRepo
     {
-        public void Add(Contract Item)
+        private readonly TempData _instance;
+
+        public ContractRepo(TempData instance)
+        {
+            _instance = instance;
+        }
+
+        public bool Add(Contract Item)
         {
             throw new NotImplementedException();
         }
@@ -25,12 +32,12 @@ namespace TimeSheets.Data.Implementation
             throw new NotImplementedException();
         }
 
-        public void Remove(Guid id)
+        public bool Remove(Guid id)
         {
             throw new NotImplementedException();
         }
 
-        public void Update(Guid id, Contract item)
+        public bool Update(Contract item)
         {
             throw new NotImplementedException();
         }

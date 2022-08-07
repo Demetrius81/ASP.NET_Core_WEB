@@ -9,7 +9,7 @@ namespace TimeSheets.Services.Interfaces
         User GetItem(string Name);
         IEnumerable<User> GetItems(int skip, int take);
         Guid AddItem(UserRequest request);
-        void UpdateItem(UserRequest request);
-        void DeleteItem(Guid id);
+        bool UpdateItem(UserRequest request);
+        bool DeleteItem(Guid id);
     }
 }
