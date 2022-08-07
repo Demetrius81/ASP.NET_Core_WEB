@@ -46,7 +46,9 @@ namespace TimeSheets.Data.Implementation
                 take = _instance.users.Count - skip;
             }
 
-            return GetSomeItems(skip, take);
+            var users = GetSomeItems(skip, take);
+
+            return users;
         }
 
         public bool Remove(Guid id)
@@ -83,7 +85,7 @@ namespace TimeSheets.Data.Implementation
         {
             for (int i = skip; i < skip + take; i++)
             {
-                yield return _instance.users[i + 1];
+                yield return _instance.users[i];
             }
         }
     }

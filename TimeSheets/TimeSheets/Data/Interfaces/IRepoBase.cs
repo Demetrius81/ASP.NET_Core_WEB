@@ -3,7 +3,7 @@
 namespace TimeSheets.Data.Interfaces
 {
     public interface IRepoBase<T>
-    {
+    {        
         T GetItem(Guid id);
         IEnumerable<T> GetItems();
         IEnumerable<T> GetItems(int skip, int take);

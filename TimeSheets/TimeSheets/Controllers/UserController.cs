@@ -5,6 +5,9 @@ using TimeSheets.Services.Interfaces;
 
 namespace TimeSheets.Controllers
 {
+    /// <summary>
+    /// Контроллер пользователей
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
@@ -16,6 +19,11 @@ namespace TimeSheets.Controllers
             _userManager = userManager;
         }
 
+        /// <summary>
+        /// Метод добавляет пользователя
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost("add")]
         public IActionResult Add([FromBody] UserRequest request)
         { 
@@ -30,6 +38,11 @@ namespace TimeSheets.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Метод возвращает пользователя по идентификатору
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("id/{id:Guid}")]
         public IActionResult Get([FromRoute] Guid id)
         {
@@ -43,6 +56,11 @@ namespace TimeSheets.Controllers
             return Ok(user);
         }
 
+        /// <summary>
+        /// Метод возвращает пользователя по имени пользователя
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         [HttpGet("search/{name}")]
         public IActionResult Get([FromRoute] string name)
         {
@@ -56,20 +74,31 @@ namespace TimeSheets.Controllers
             return Ok(user);
         }
 
+        /// <summary>
+        /// Метод возвращает коллекцию пользователей в указанном количестве, при этом пропускает указанное количество
+        /// </summary>
+        /// <param name="skip">Сколько пропустить</param>
+        /// <param name="take">Сколько вывести</param>
+        /// <returns></returns>
         [HttpGet("skip/{skip:int}/take/{take:int}")]
         public IActionResult Get([FromRoute] int skip = 5, int take = 10)
         {
-            var user = _userManager.GetItems(skip, take);
+            var users = _userManager.GetItems(skip, take);
 
-            if (user == null)
+            if (users == null)
             {
                 return NotFound();
             }
 
-            return Ok(user);
+            return Ok(users);
         }
 
-        [HttpPut("delete/{id:guid}")]
+        /// <summary>
+        /// Метод обновляет данные пользователя
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPut("update")]
         public IActionResult Update([FromBody] UserRequest request)
         {
             bool flag = _userManager.UpdateItem(request);
@@ -82,6 +111,11 @@ namespace TimeSheets.Controllers
             return BadRequest();
         }
 
+        /// <summary>
+        /// Метод удаляет пользователя
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete("delete/{id:guid}")]
         public IActionResult Delete([FromRoute] Guid id)
         {
