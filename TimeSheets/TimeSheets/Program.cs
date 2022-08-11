@@ -1,8 +1,10 @@
+using Microsoft.EntityFrameworkCore;
 using TimeSheets.Data;
 using TimeSheets.Data.Implementation;
 using TimeSheets.Data.Interfaces;
 using TimeSheets.Services.Implementation;
 using TimeSheets.Services.Interfaces;
+using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +16,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 //builder.Services.AddScoped<ISheetRepo, SheetRepo>();
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+
+builder.Services.AddDbContext<TimeSheetDbContext>(options =>
+    options.UseNpgsql(connectionString)); 
 
 builder.Services.AddSingleton(typeof(TempData));   //Temprary item
 
