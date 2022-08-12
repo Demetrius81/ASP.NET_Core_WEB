@@ -12,34 +12,81 @@ namespace TimeSheets.Data.Implementation
             _instance = instance;
         }
 
-        public bool Add(Sheet Item)
+        public async Task<bool> AddAsync(Sheet Item)
         {
-            throw new NotImplementedException();
+            if (Item == null)
+            {
+                return false;
+            }
+
+            _instance.sheets.Add(Item);
+
+            return true;
         }
 
-        public Sheet GetItem(Guid id)
+        public async Task<Sheet> GetItemAsync(Guid id)
         {
-            throw new NotImplementedException();
+            return _instance.sheets.FirstOrDefault(x => x.Id == id);
         }
 
-        public IEnumerable<Sheet> GetItems()
+        public async Task<IEnumerable<Sheet>> GetItemsAsync()
         {
-            throw new NotImplementedException();
+            return _instance.sheets;
         }
 
-        public IEnumerable<Sheet> GetItems(int skip, int take)
+        public async Task<IEnumerable<Sheet>> GetItemsAsync(int skip, int take)
         {
-            throw new NotImplementedException();
+            if (skip >= _instance.sheets.Count)
+            {
+                return null;
+            }
+
+            if ((skip + take) > _instance.sheets.Count)
+            {
+                take = _instance.sheets.Count - skip;
+            }
+
+            var sheets = GetSomeItems(skip, take);
+
+            return sheets;
         }
 
-        public bool Remove(Guid id)
+        public async Task<bool> RemoveAsync(Guid id)
         {
-            throw new NotImplementedException();
+            Sheet? sheet = _instance.sheets.FirstOrDefault(x => x.Id == id);
+
+            if (sheet is not null)
+            {
+                _instance.sheets.Remove(sheet);
+
+                return true;
+            }
+
+            return false;
         }
 
-        public bool Update(Sheet item)
+        public async Task<bool> UpdateAsync(Sheet item)
         {
-            throw new NotImplementedException();
+            Sheet? sheet = _instance.sheets.FirstOrDefault(x => x.Id == item.Id);
+
+            if (sheet == null)
+            {
+                return false;
+            }
+
+            _instance.sheets.Remove(sheet);
+
+            _instance.sheets.Add(item);
+
+            return true;
+        }
+
+        private IEnumerable<Sheet> GetSomeItems(int skip, int take)
+        {
+            for (int i = skip; i < skip + take; i++)
+            {
+                yield return _instance.sheets[i];
+            }
         }
     }
 }

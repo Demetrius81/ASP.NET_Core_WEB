@@ -12,7 +12,7 @@ namespace TimeSheets.Data.Implementation
             _instance = instance;
         }
 
-        public bool Add(User Item)
+        public async Task<bool> AddAsync(User Item)
         {
             if (Item == null)
             {
@@ -24,17 +24,17 @@ namespace TimeSheets.Data.Implementation
             return true;
         }
 
-        public User GetItem(Guid id)
+        public async Task<User> GetItemAsync(Guid id)
         {
             return _instance.users.FirstOrDefault(x => x.Id == id);
         }
 
-        public IEnumerable<User> GetItems()
+        public async Task<IEnumerable<User>> GetItemsAsync()
         {
             return _instance.users;
         }
 
-        public IEnumerable<User> GetItems(int skip, int take)
+        public async Task<IEnumerable<User>> GetItemsAsync(int skip, int take)
         {
             if (skip >= _instance.users.Count)
             {
@@ -51,7 +51,7 @@ namespace TimeSheets.Data.Implementation
             return users;
         }
 
-        public bool Remove(Guid id)
+        public async Task<bool> RemoveAsync(Guid id)
         {
             User? user = _instance.users.FirstOrDefault(x => x.Id == id);
 
@@ -65,7 +65,7 @@ namespace TimeSheets.Data.Implementation
             return false;
         }
 
-        public bool Update(User item)
+        public async Task<bool> UpdateAsync(User item)
         {
             User? user = _instance.users.FirstOrDefault(x => x.Id == item.Id);
 

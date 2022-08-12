@@ -13,34 +13,81 @@ namespace TimeSheets.Data.Implementation
             _instance = instance;
         }
 
-        public bool Add(Service Item)
+        public async Task<bool> AddAsync(Service Item)
         {
-            throw new NotImplementedException();
+            if (Item == null)
+            {
+                return false;
+            }
+
+            _instance.services.Add(Item);
+
+            return true;
         }
 
-        public Service GetItem(Guid id)
+        public async Task<Service> GetItemAsync(Guid id)
         {
-            throw new NotImplementedException();
+            return _instance.services.FirstOrDefault(x => x.Id == id);
         }
 
-        public IEnumerable<Service> GetItems()
+        public async Task<IEnumerable<Service>> GetItemsAsync()
         {
-            throw new NotImplementedException();
+            return _instance.services;
         }
 
-        public IEnumerable<Service> GetItems(int skip, int take)
+        public async Task<IEnumerable<Service>> GetItemsAsync(int skip, int take)
         {
-            throw new NotImplementedException();
+            if (skip >= _instance.services.Count)
+            {
+                return null;
+            }
+
+            if ((skip + take) > _instance.services.Count)
+            {
+                take = _instance.services.Count - skip;
+            }
+
+            var services = GetSomeItems(skip, take);
+
+            return services;
         }
 
-        public bool Remove(Guid id)
+        public async Task<bool> RemoveAsync(Guid id)
         {
-            throw new NotImplementedException();
+            Service? service = _instance.services.FirstOrDefault(x => x.Id == id);
+
+            if (service is not null)
+            {
+                _instance.services.Remove(service);
+
+                return true;
+            }
+
+            return false;
         }
 
-        public bool Update(Service item)
+        public async Task<bool> UpdateAsync(Service item)
         {
-            throw new NotImplementedException();
+            Service? service = _instance.services.FirstOrDefault(x => x.Id == item.Id);
+
+            if (service == null)
+            {
+                return false;
+            }
+
+            _instance.services.Remove(service);
+
+            _instance.services.Add(item);
+
+            return true;
+        }
+
+        private IEnumerable<Service> GetSomeItems(int skip, int take)
+        {
+            for (int i = skip; i < skip + take; i++)
+            {
+                yield return _instance.services[i];
+            }
         }
     }
 }

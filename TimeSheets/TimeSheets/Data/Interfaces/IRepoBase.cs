@@ -4,11 +4,11 @@ namespace TimeSheets.Data.Interfaces
 {
     public interface IRepoBase<T>
     {        
-        T GetItem(Guid id);
-        IEnumerable<T> GetItems();
-        IEnumerable<T> GetItems(int skip, int take);
-        bool Add(T Item);
-        bool Update(T item);
-        bool Remove(Guid id);
+        Task<T> GetItemAsync(Guid id);
+        Task<IEnumerable<T>> GetItemsAsync();
+        Task<IEnumerable<T>> GetItemsAsync(int skip, int take);
+        Task<bool> AddAsync(T Item);
+        Task<bool> UpdateAsync(T item);
+        Task<bool> RemoveAsync(Guid id);
     }
 }

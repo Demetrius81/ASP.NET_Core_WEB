@@ -12,34 +12,81 @@ namespace TimeSheets.Data.Implementation
             _instance = instance;
         }
 
-        public bool Add(Client Item)
+        public async Task<bool> AddAsync(Client Item)
         {
-            throw new NotImplementedException();
+            if (Item == null)
+            {
+                return false;
+            }
+
+            _instance.clients.Add(Item);
+
+            return true;
         }
 
-        public Client GetItem(Guid id)
+        public async Task<Client> GetItemAsync(Guid id)
         {
-            throw new NotImplementedException();
+            return _instance.clients.FirstOrDefault(x => x.Id == id);
         }
 
-        public IEnumerable<Client> GetItems()
+        public async Task<IEnumerable<Client>> GetItemsAsync()
         {
-            throw new NotImplementedException();
+            return _instance.clients;
         }
 
-        public IEnumerable<Client> GetItems(int skip, int take)
+        public async Task<IEnumerable<Client>> GetItemsAsync(int skip, int take)
         {
-            throw new NotImplementedException();
+            if (skip >= _instance.clients.Count)
+            {
+                return null;
+            }
+
+            if ((skip + take) > _instance.clients.Count)
+            {
+                take = _instance.clients.Count - skip;
+            }
+
+            var clients = GetSomeItems(skip, take);
+
+            return clients;
         }
 
-        public bool Remove(Guid id)
+        public async Task<bool> RemoveAsync(Guid id)
         {
-            throw new NotImplementedException();
+            Client? client = _instance.clients.FirstOrDefault(x => x.Id == id);
+
+            if (client is not null)
+            {
+                _instance.clients.Remove(client);
+
+                return true;
+            }
+
+            return false;
         }
 
-        public bool Update(Client item)
+        public async Task<bool> UpdateAsync(Client item)
         {
-            throw new NotImplementedException();
+            Client? client = _instance.clients.FirstOrDefault(x => x.Id == item.Id);
+
+            if (client == null)
+            {
+                return false;
+            }
+
+            _instance.clients.Remove(client);
+
+            _instance.clients.Add(item);
+
+            return true;
+        }
+
+        private IEnumerable<Client> GetSomeItems(int skip, int take)
+        {
+            for (int i = skip; i < skip + take; i++)
+            {
+                yield return _instance.clients[i];
+            }
         }
     }
 }

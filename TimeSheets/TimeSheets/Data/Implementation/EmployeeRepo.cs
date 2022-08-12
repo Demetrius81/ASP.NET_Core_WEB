@@ -12,34 +12,81 @@ namespace TimeSheets.Data.Implementation
             _instance = instance;
         }
 
-        public bool Add(Employee Item)
+        public async Task<bool> AddAsync(Employee Item)
         {
-            throw new NotImplementedException();
+            if (Item == null)
+            {
+                return false;
+            }
+
+            _instance.employes.Add(Item);
+
+            return true;
         }
 
-        public Employee GetItem(Guid id)
+        public async Task<Employee> GetItemAsync(Guid id)
         {
-            throw new NotImplementedException();
+            return _instance.employes.FirstOrDefault(x => x.Id == id);
         }
 
-        public IEnumerable<Employee> GetItems()
+        public async Task<IEnumerable<Employee>> GetItemsAsync()
         {
-            throw new NotImplementedException();
+            return _instance.employes;
         }
 
-        public IEnumerable<Employee> GetItems(int skip, int take)
+        public async Task<IEnumerable<Employee>> GetItemsAsync(int skip, int take)
         {
-            throw new NotImplementedException();
+            if (skip >= _instance.employes.Count)
+            {
+                return null;
+            }
+
+            if ((skip + take) > _instance.employes.Count)
+            {
+                take = _instance.employes.Count - skip;
+            }
+
+            var employees = GetSomeItems(skip, take);
+
+            return employees;
         }
 
-        public bool Remove(Guid id)
+        public async Task<bool> RemoveAsync(Guid id)
         {
-            throw new NotImplementedException();
+            Employee? employee = _instance.employes.FirstOrDefault(x => x.Id == id);
+
+            if (employee is not null)
+            {
+                _instance.employes.Remove(employee);
+
+                return true;
+            }
+
+            return false;
         }
 
-        public bool Update(Employee item)
+        public async Task<bool> UpdateAsync(Employee item)
         {
-            throw new NotImplementedException();
+            Employee? employee = _instance.employes.FirstOrDefault(x => x.Id == item.Id);
+
+            if (employee == null)
+            {
+                return false;
+            }
+
+            _instance.employes.Remove(employee);
+
+            _instance.employes.Add(item);
+
+            return true;
+        }
+
+        private IEnumerable<Employee> GetSomeItems(int skip, int take)
+        {
+            for (int i = skip; i < skip + take; i++)
+            {
+                yield return _instance.employes[i];
+            }
         }
     }
 }
