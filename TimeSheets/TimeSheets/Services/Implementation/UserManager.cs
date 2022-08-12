@@ -14,7 +14,23 @@ namespace TimeSheets.Services.Implementation
             _userRepo = userRepo;
         }
 
-        public Guid AddItem(UserRequest request)
+        public async Task<User> GetItemAsync(Guid id)
+        {
+            return await _userRepo.GetItemAsync(id);
+        }
+
+        public async Task<User> GetItemAsync(string Name)
+        {
+            IEnumerable<User> users = await _userRepo.GetItemsAsync();
+
+            return users.FirstOrDefault(x => x.UserName == Name);
+        }
+
+        public async Task<IEnumerable<User>> GetItemsAsync(int skip, int take)
+        {
+            return await _userRepo.GetItemsAsync(skip, take);
+        }
+        public async Task<Guid> AddItemAsync(UserRequest request)
         {
             User user = new User()
             {
@@ -27,48 +43,25 @@ namespace TimeSheets.Services.Implementation
                 Age = request.Age
             };
 
-            bool flag = _userRepo.Add(user);
+            bool flag = await _userRepo.AddAsync(user);
 
-            if (flag)
-            {
-                return user.Id;
-            }
-
-            return default;
+            return flag ? user.Id : default;
         }
 
-        public bool DeleteItem(Guid id)
+        public async Task<bool> UpdateItemAsync(UserRequest request)
         {
-            return _userRepo.Remove(id);
-        }
+            IEnumerable<User> users = await _userRepo.GetItemsAsync();
 
-        public User GetItem(Guid id)
-        {
-            return _userRepo.GetItem(id);
-        }
+            User? user = users.FirstOrDefault(x => x.UserName == request.UserName);
 
-        public User GetItem(string Name)
-        {
-            return _userRepo.GetItems().FirstOrDefault(x => x.UserName == Name);
-        }
-
-        public IEnumerable<User> GetItems(int skip, int take)
-        {
-            return _userRepo.GetItems(skip, take);
-        }
-
-        public bool UpdateItem(UserRequest request)
-        {
-            User? userFromDb = _userRepo.GetItems().FirstOrDefault(x => x.UserName == request.UserName);
-
-            if (userFromDb == null)
+            if (user == null)
             {
                 return false;
             }
 
-            User user = new User()
+            User newUser = new User()
             {
-                Id = userFromDb.Id,
+                Id = user.Id,
                 UserName = request.UserName,
                 FirstName = request.FirstName,
                 LastName = request.LastName,
@@ -77,9 +70,15 @@ namespace TimeSheets.Services.Implementation
                 Age = request.Age
             };
 
-            bool flag = _userRepo.Update(user);
+            bool flag = await _userRepo.UpdateAsync(user);
 
             return flag;
         }
+
+        public async Task<bool> DeleteItemAsync(Guid id)
+        {
+            return await _userRepo.RemoveAsync(id);
+        }
+
     }
 }

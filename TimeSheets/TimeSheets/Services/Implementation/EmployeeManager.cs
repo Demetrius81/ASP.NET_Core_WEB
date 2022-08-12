@@ -7,41 +7,53 @@ namespace TimeSheets.Services.Implementation
 {
     public class EmployeeManager : IEmployeeManager
     {
-        private readonly IUserRepo _employeeRepo;
+        private readonly IEmployeeRepo _employeeRepo;
 
-        public EmployeeManager(IUserRepo employeeRepo)
+        public EmployeeManager(IEmployeeRepo employeeRepo)
         {
             _employeeRepo = employeeRepo;
         }
 
-        public Guid AddItem(EmployeeRequest request)
+        public async Task<Guid> AddItem(EmployeeRequest request)
         {
-            throw new NotImplementedException();
+            Employee employee = new Employee()
+            {
+                Id = Guid.NewGuid(),
+                UserId = request.UserId
+            };
+
+            bool flag = await _employeeRepo.AddAsync(employee);
+
+            return flag ? employee.Id : default;
         }
 
-        public bool DeleteItem(Guid id)
+        public async Task<bool> DeleteItem(Guid id)
         {
-            throw new NotImplementedException();
+            return await _employeeRepo.RemoveAsync(id);
         }
 
-        public User GetItem(Guid id)
+        public async Task<Employee> GetItem(Guid id)
         {
-            throw new NotImplementedException();
+            return await _employeeRepo.GetItemAsync(id);
         }
 
-        public User GetItem(string Name)
+        public async Task<IEnumerable<Employee>> GetItems(int skip, int take)
         {
-            throw new NotImplementedException();
+            return await _employeeRepo.GetItemsAsync(skip, take);
+
         }
 
-        public IEnumerable<User> GetItems(int skip, int take)
+        public async Task<bool> UpdateItem(EmployeeRequest request)
         {
-            throw new NotImplementedException();
-        }
+            Employee employee = await _employeeRepo.GetItemByUserIdAsync(request.UserId);
 
-        public bool UpdateItem(EmployeeRequest request)
-        {
-            throw new NotImplementedException();
+            employee = new Employee()
+            {
+                Id = employee.Id,
+                UserId = request.UserId
+            };
+
+            return await _employeeRepo.UpdateAsync(employee);
         }
     }
 }

@@ -5,11 +5,10 @@ namespace TimeSheets.Services.Interfaces
 {
     public interface IEmployeeManager
     {
-        User GetItem(Guid id);
-        User GetItem(string Name);
-        IEnumerable<User> GetItems(int skip, int take);
-        Guid AddItem(EmployeeRequest request);
-        bool UpdateItem(EmployeeRequest request);
-        bool DeleteItem(Guid id);
+        Task<Employee> GetItem(Guid id);        
+        Task<IEnumerable<Employee>> GetItems(int skip, int take);
+        Task<Guid> AddItem(EmployeeRequest request);
+        Task<bool> UpdateItem(EmployeeRequest request);
+        Task<bool> DeleteItem(Guid id);
     }
 }
