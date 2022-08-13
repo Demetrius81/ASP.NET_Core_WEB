@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using TimeSheets.Models;
 using TimeSheets.Models.Dto;
 using TimeSheets.Services.Interfaces;
 
@@ -8,13 +9,13 @@ namespace TimeSheets.Controllers
     /// <summary>
     /// Контроллер пользователей
     /// </summary>
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class UsersController : ControllerBase
     {
         private readonly IUserManager _userManager;
 
-        public UserController(IUserManager userManager)
+        public UsersController(IUserManager userManager)
         {
             _userManager = userManager;
         }
@@ -25,10 +26,9 @@ namespace TimeSheets.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("add")]
-        public IActionResult Add([FromBody] UserRequest request)
-        { 
-            Guid response = _userManager.AddItem(request);
-           
+        public async Task<IActionResult> Add([FromBody] UserRequest request)
+        {
+            Guid response = await _userManager.AddItemAsync(request);
 
             if (response == default)
             {
@@ -43,10 +43,10 @@ namespace TimeSheets.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("id/{id:Guid}")]
-        public IActionResult Get([FromRoute] Guid id)
+        [HttpGet("get/{id:Guid}")]
+        public async Task<IActionResult> Get([FromRoute] Guid id)
         {
-            var user = _userManager.GetItem(id);
+            User user = await _userManager.GetItemAsync(id);
 
             if (user == null)
             {
@@ -62,9 +62,9 @@ namespace TimeSheets.Controllers
         /// <param name="name"></param>
         /// <returns></returns>
         [HttpGet("search/{name}")]
-        public IActionResult Get([FromRoute] string name)
+        public async Task<IActionResult> Get([FromRoute] string name)
         {
-            var user = _userManager.GetItem(name);
+            User user = await _userManager.GetItemAsync(name);
 
             if (user == null)
             {
@@ -81,9 +81,9 @@ namespace TimeSheets.Controllers
         /// <param name="take">Сколько вывести</param>
         /// <returns></returns>
         [HttpGet("skip/{skip:int}/take/{take:int}")]
-        public IActionResult Get([FromRoute] int skip = 5, int take = 10)
+        public async Task<IActionResult> Get([FromRoute] int skip = 5, int take = 10)
         {
-            var users = _userManager.GetItems(skip, take);
+            IEnumerable<User> users = await _userManager.GetItemsAsync(skip, take);
 
             if (users == null)
             {
@@ -99,9 +99,9 @@ namespace TimeSheets.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPut("update")]
-        public IActionResult Update([FromBody] UserRequest request)
+        public async Task<IActionResult> Update([FromBody] UserRequest request)
         {
-            bool flag = _userManager.UpdateItem(request);
+            bool flag = await _userManager.UpdateItemAsync(request);
 
             if (flag)
             {
@@ -117,9 +117,9 @@ namespace TimeSheets.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("delete/{id:guid}")]
-        public IActionResult Delete([FromRoute] Guid id)
+        public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
-            bool flag = _userManager.DeleteItem(id);
+            bool flag = await _userManager.DeleteItemAsync(id);
 
             if (flag)
             {

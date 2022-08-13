@@ -7,32 +7,36 @@ namespace TimeSheets.Controllers
     /// <summary>
     /// Контроллер сотрудников
     /// </summary>
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
-    public class EmployeeController : ControllerBase
+    public class EmployeesController : ControllerBase
     {
         private readonly IEmployeeManager _employeeManager;
 
-        public EmployeeController(IEmployeeManager employeeManager)
+        public EmployeesController(IEmployeeManager employeeManager)
         {
             _employeeManager = employeeManager;
         }
 
+        [HttpPost("add")]
         public IActionResult Add()
         {
             return Ok();
         }
 
+        [HttpGet("get/{id:Guid}")]
         public IActionResult Get()
         {
             return Ok();
         }
 
+        [HttpPut("update")]
         public IActionResult Update()
         {
             return Ok();
         }
 
+        [HttpDelete("delete/{id:guid}")]
         public IActionResult Delete()
         {
             return Ok();
