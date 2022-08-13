@@ -47,6 +47,11 @@ namespace TimeSheets.Services.Implementation
         {
             Employee employee = await _employeeRepo.GetItemByUserIdAsync(request.UserId);
 
+            if (employee == null)
+            {
+                return false;
+            }
+
             employee = new Employee()
             {
                 Id = employee.Id,

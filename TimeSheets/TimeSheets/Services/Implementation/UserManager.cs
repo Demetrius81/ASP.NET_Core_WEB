@@ -19,11 +19,9 @@ namespace TimeSheets.Services.Implementation
             return await _userRepo.GetItemAsync(id);
         }
 
-        public async Task<User> GetItemAsync(string Name)
+        public async Task<User> GetItemAsync(string name)
         {
-            IEnumerable<User> users = await _userRepo.GetItemsAsync();
-
-            return users.FirstOrDefault(x => x.UserName == Name);
+            return await _userRepo.GetItemAsyncByName(name);
         }
 
         public async Task<IEnumerable<User>> GetItemsAsync(int skip, int take)
@@ -50,9 +48,7 @@ namespace TimeSheets.Services.Implementation
 
         public async Task<bool> UpdateItemAsync(UserRequest request)
         {
-            IEnumerable<User> users = await _userRepo.GetItemsAsync();
-
-            User? user = users.FirstOrDefault(x => x.UserName == request.UserName);
+            User? user = await _userRepo.GetItemAsyncByName(request.UserName);
 
             if (user == null)
             {

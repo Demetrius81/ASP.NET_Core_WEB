@@ -29,6 +29,11 @@ namespace TimeSheets.Data.Implementation
             return _instance.users.FirstOrDefault(x => x.Id == id);
         }
 
+        public async Task<User> GetItemAsyncByName(string name)
+        {
+            return _instance.users.FirstOrDefault(x=>x.UserName == name);
+        }
+
         public async Task<IEnumerable<User>> GetItemsAsync()
         {
             return _instance.users;

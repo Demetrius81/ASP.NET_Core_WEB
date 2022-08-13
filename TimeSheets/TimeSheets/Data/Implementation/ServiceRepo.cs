@@ -30,6 +30,11 @@ namespace TimeSheets.Data.Implementation
             return _instance.services.FirstOrDefault(x => x.Id == id);
         }
 
+        public async Task<Service> GetItemAsyncByName(string name)
+        {
+            return _instance.services.FirstOrDefault(x => x.Name == name);
+        }
+
         public async Task<IEnumerable<Service>> GetItemsAsync()
         {
             return _instance.services;

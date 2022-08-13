@@ -1,13 +1,9 @@
-﻿namespace TimeSheets.Models
+﻿namespace TimeSheets.Models.Dto
 {
-    /// <summary>
-    /// Информация о договоре с клиентом
-    /// </summary>
-    public class Contract
+    public class ContractRequest
     {
-        public Guid Id { get; set; }
-        //public Guid ClientId { get; set; }
         public string Title { get; set; }
+        //public Guid ClientId { get; set; }
         public DateTime DateStart { get; set; }
         public DateTime DateEnd { get; set; }
         public string Description { get; set; }

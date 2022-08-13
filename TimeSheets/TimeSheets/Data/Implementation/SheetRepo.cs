@@ -29,6 +29,11 @@ namespace TimeSheets.Data.Implementation
             return _instance.sheets.FirstOrDefault(x => x.Id == id);
         }
 
+        public async Task<Sheet> GetItemAsyncByDate(DateTime date)
+        {
+            return _instance.sheets.FirstOrDefault(x => x.Date == date);
+        }
+
         public async Task<IEnumerable<Sheet>> GetItemsAsync()
         {
             return _instance.sheets;
