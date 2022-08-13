@@ -1,34 +1,34 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using TimeSheets.Services.Interfaces;
 using TimeSheets.Models;
 using TimeSheets.Models.Dto;
-using TimeSheets.Services.Interfaces;
 
 namespace TimeSheets.Controllers
 {
     /// <summary>
-    /// Контроллер сотрудников
+    /// Контроллер клиентов
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    public class EmployeesController : ControllerBase
+    public class ClientsController : ControllerBase
     {
-        private readonly IEmployeeManager _employeeManager;
+        private readonly IClientManager _clientManager;
 
-        public EmployeesController(IEmployeeManager employeeManager)
+        public ClientsController(IClientManager clientManager)
         {
-            _employeeManager = employeeManager;
+            _clientManager = clientManager;
         }
 
         /// <summary>
-        /// Метод добавляет сотрудника
+        /// Метод добавляет клиента
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("add")]
-        public async Task<IActionResult> Add([FromBody] EmployeeRequest request)
+        public async Task<IActionResult> Add([FromBody] ClientRequest request)
         {
-            Guid response = await _employeeManager.AddItemAsync(request);
+            Guid response = await _clientManager.AddItemAsync(request);
 
             if (response == default)
             {
@@ -39,14 +39,14 @@ namespace TimeSheets.Controllers
         }
 
         /// <summary>
-        /// Метод возвращает сотрудника по идентификатору
+        /// Метод возвращает клиента по идентификатору
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("get/{id:Guid}")]
         public async Task<IActionResult> Get([FromRoute] Guid id)
         {
-            Employee user = await _employeeManager.GetItemAsync(id);
+            Client user = await _clientManager.GetItemAsync(id);
 
             if (user == null)
             {
@@ -55,9 +55,9 @@ namespace TimeSheets.Controllers
 
             return Ok(user);
         }
-        
+
         /// <summary>
-        /// Метод возвращает коллекцию сотрудников в указанном количестве, при этом пропускает указанное количество
+        /// Метод возвращает коллекцию клиентов в указанном количестве, при этом пропускает указанное количество
         /// </summary>
         /// <param name="skip">Сколько пропустить</param>
         /// <param name="take">Сколько вывести</param>
@@ -65,7 +65,7 @@ namespace TimeSheets.Controllers
         [HttpGet("skip/{skip:int}/take/{take:int}")]
         public async Task<IActionResult> Get([FromRoute] int skip = 5, int take = 10)
         {
-            IEnumerable<Employee> users = await _employeeManager.GetItemsAsync(skip, take);
+            IEnumerable<Client> users = await _clientManager.GetItemsAsync(skip, take);
 
             if (users == null)
             {
@@ -76,32 +76,27 @@ namespace TimeSheets.Controllers
         }
 
         /// <summary>
-        /// Метод обновляет данные сотрудника
+        /// Метод обновляет данные клиента
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPut("update")]
-        public async Task<IActionResult> Update([FromBody] EmployeeRequest request)
-        {
-            bool flag = await _employeeManager.UpdateItemAsync(request);
+        //[HttpPut("update")]
+        //public async Task<IActionResult> Update([FromBody] ClientRequest request)
+        //{
 
-            if (flag)
-            {
-                return Ok();
-            }
+        //    return Ok();
 
-            return BadRequest();
-        }
+        //}
 
         /// <summary>
-        /// Метод удаляет сотрудника
+        /// Метод удаляет клиента
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("delete/{id:guid}")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
-            bool flag = await _employeeManager.DeleteItemAsync(id);
+            bool flag = await _clientManager.DeleteItemAsync(id);
 
             if (flag)
             {

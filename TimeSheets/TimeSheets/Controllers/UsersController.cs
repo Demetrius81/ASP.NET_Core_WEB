@@ -9,7 +9,7 @@ namespace TimeSheets.Controllers
     /// <summary>
     /// Контроллер пользователей
     /// </summary>
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
     {

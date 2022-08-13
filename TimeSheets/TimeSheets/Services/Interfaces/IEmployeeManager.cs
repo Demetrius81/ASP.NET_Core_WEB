@@ -5,10 +5,10 @@ namespace TimeSheets.Services.Interfaces
 {
     public interface IEmployeeManager
     {
-        Task<Employee> GetItem(Guid id);        
-        Task<IEnumerable<Employee>> GetItems(int skip, int take);
-        Task<Guid> AddItem(EmployeeRequest request);
-        Task<bool> UpdateItem(EmployeeRequest request);
-        Task<bool> DeleteItem(Guid id);
+        Task<Employee> GetItemAsync(Guid id);        
+        Task<IEnumerable<Employee>> GetItemsAsync(int skip, int take);
+        Task<Guid> AddItemAsync(EmployeeRequest request);
+        Task<bool> UpdateItemAsync(EmployeeRequest request);
+        Task<bool> DeleteItemAsync(Guid id);
     }
 }

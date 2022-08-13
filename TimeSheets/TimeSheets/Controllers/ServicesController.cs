@@ -1,34 +1,34 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using TimeSheets.Services.Interfaces;
 using TimeSheets.Models;
 using TimeSheets.Models.Dto;
-using TimeSheets.Services.Interfaces;
 
 namespace TimeSheets.Controllers
 {
     /// <summary>
-    /// Контроллер табелей
+    /// Контроллер услуг
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    public class SheetsController : ControllerBase
+    public class ServicesController : ControllerBase
     {
-        private readonly ISheetManager _sheetManager;
+        private readonly ISerrviceManager _serviceManager;
 
-        public SheetsController(ISheetManager sheetManager)
+        public ServicesController(ISerrviceManager serviceManager)
         {
-            _sheetManager = sheetManager;
+            _serviceManager = serviceManager;
         }
 
         /// <summary>
-        /// Метод добавляет табель
+        /// Метод добавляет услугу
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("add")]
-        public async Task<IActionResult> Add([FromBody] SheetRequest request)
+        public async Task<IActionResult> Add([FromBody] ServiceRequest request)
         {
-            Guid response = await _sheetManager.AddItemAsync(request);
+            Guid response = await _serviceManager.AddItemAsync(request);
 
             if (response == default)
             {
@@ -39,14 +39,14 @@ namespace TimeSheets.Controllers
         }
 
         /// <summary>
-        /// Метод возвращает табель по идентификатору
+        /// Метод возвращает услугу по идентификатору
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("get/{id:Guid}")]
         public async Task<IActionResult> Get([FromRoute] Guid id)
         {
-            Sheet user = await _sheetManager.GetItemAsync(id);
+            Service user = await _serviceManager.GetItemAsync(id);
 
             if (user == null)
             {
@@ -57,14 +57,14 @@ namespace TimeSheets.Controllers
         }
 
         /// <summary>
-        /// Метод возвращает табель по дате
+        /// Метод возвращает услугу по названию
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        [HttpGet("search/{date:DateTime}")]
-        public async Task<IActionResult> Get([FromRoute] DateTime date)
+        [HttpGet("search/{name}")]
+        public async Task<IActionResult> Get([FromRoute] string name)
         {
-            Sheet user = await _sheetManager.GetItemAsync(date);
+            Service user = await _serviceManager.GetItemAsync(name);
 
             if (user == null)
             {
@@ -75,7 +75,7 @@ namespace TimeSheets.Controllers
         }
 
         /// <summary>
-        /// Метод возвращает коллекцию табелей в указанном количестве, при этом пропускает указанное количество
+        /// Метод возвращает коллекцию услуг в указанном количестве, при этом пропускает указанное количество
         /// </summary>
         /// <param name="skip">Сколько пропустить</param>
         /// <param name="take">Сколько вывести</param>
@@ -83,7 +83,7 @@ namespace TimeSheets.Controllers
         [HttpGet("skip/{skip:int}/take/{take:int}")]
         public async Task<IActionResult> Get([FromRoute] int skip = 5, int take = 10)
         {
-            IEnumerable<Sheet> users = await _sheetManager.GetItemsAsync(skip, take);
+            IEnumerable<Service> users = await _serviceManager.GetItemsAsync(skip, take);
 
             if (users == null)
             {
@@ -94,14 +94,14 @@ namespace TimeSheets.Controllers
         }
 
         /// <summary>
-        /// Метод обновляет данные табеля
+        /// Метод обновляет данные услуги
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPut("update")]
-        public async Task<IActionResult> Update([FromBody] SheetRequest request)
+        public async Task<IActionResult> Update([FromBody] ServiceRequest request)
         {
-            bool flag = await _sheetManager.UpdateItemAsync(request);
+            bool flag = await _serviceManager.UpdateItemAsync(request);
 
             if (flag)
             {
@@ -112,14 +112,14 @@ namespace TimeSheets.Controllers
         }
 
         /// <summary>
-        /// Метод удаляет табель
+        /// Метод удаляет услугу
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("delete/{id:guid}")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
-            bool flag = await _sheetManager.DeleteItemAsync(id);
+            bool flag = await _serviceManager.DeleteItemAsync(id);
 
             if (flag)
             {
