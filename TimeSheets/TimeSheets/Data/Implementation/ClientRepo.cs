@@ -5,9 +5,9 @@ namespace TimeSheets.Data.Implementation
 {
     public class ClientRepo : IClientRepo
     {
-        private readonly TempData _instance;
+        private readonly TimeSheetDbContext _instance;
 
-        public ClientRepo(TempData instance)
+        public ClientRepo(TimeSheetDbContext instance)
         {
             _instance = instance;
         }
@@ -19,45 +19,51 @@ namespace TimeSheets.Data.Implementation
                 return false;
             }
 
-            _instance.clients.Add(Item);
+            await _instance.Clients.AddAsync(Item);
+
+            await _instance.SaveChangesAsync();
 
             return true;
         }
 
         public async Task<Client> GetItemAsync(Guid id)
         {
-            return _instance.clients.FirstOrDefault(x => x.Id == id);
+            return _instance.Clients.FirstOrDefault(x => x.Id == id);
         }
 
         public async Task<IEnumerable<Client>> GetItemsAsync()
         {
-            return _instance.clients;
+            return _instance.Clients;
         }
 
         public async Task<IEnumerable<Client>> GetItemsAsync(int skip, int take)
         {
-            if (skip >= _instance.clients.Count)
+            int count = _instance.Clients.Count();
+
+            if (skip >= count)
             {
                 return null;
             }
 
-            if ((skip + take) > _instance.clients.Count)
+            if ((skip + take) > count)
             {
-                take = _instance.clients.Count - skip;
+                take = count;
             }
 
-            var clients = GetSomeItems(skip, take);
+            var clients = _instance.Clients.Skip(skip).Take(take).ToList();
 
             return clients;
         }
 
         public async Task<bool> RemoveAsync(Guid id)
         {
-            Client? client = _instance.clients.FirstOrDefault(x => x.Id == id);
+            Client? client = _instance.Clients.FirstOrDefault(x => x.Id == id);
 
             if (client is not null)
             {
-                _instance.clients.Remove(client);
+                _instance.Clients.Remove(client);
+
+                await _instance.SaveChangesAsync();
 
                 return true;
             }
@@ -67,26 +73,18 @@ namespace TimeSheets.Data.Implementation
 
         public async Task<bool> UpdateAsync(Client item)
         {
-            Client? client = _instance.clients.FirstOrDefault(x => x.Id == item.Id);
+            Client? client = _instance.Clients.FirstOrDefault(x => x.Id == item.Id);
 
             if (client == null)
             {
                 return false;
             }
 
-            _instance.clients.Remove(client);
+            _instance.Clients.Update(client);
 
-            _instance.clients.Add(item);
+            await _instance.SaveChangesAsync();
 
             return true;
-        }
-
-        private IEnumerable<Client> GetSomeItems(int skip, int take)
-        {
-            for (int i = skip; i < skip + take; i++)
-            {
-                yield return _instance.clients[i];
-            }
-        }
+        }        
     }
 }

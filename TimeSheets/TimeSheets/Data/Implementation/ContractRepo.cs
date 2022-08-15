@@ -5,9 +5,9 @@ namespace TimeSheets.Data.Implementation
 {
     public class ContractRepo : IContractRepo
     {
-        private readonly TempData _instance;
+        private readonly TimeSheetDbContext _instance;
 
-        public ContractRepo(TempData instance)
+        public ContractRepo(TimeSheetDbContext instance)
         {
             _instance = instance;
         }
@@ -19,50 +19,54 @@ namespace TimeSheets.Data.Implementation
                 return false;
             }
 
-            _instance.contracts.Add(Item);
+            await _instance.Contracts.AddAsync(Item);
 
             return true;
         }
 
         public async Task<Contract> GetItemAsync(Guid id)
         {
-            return _instance.contracts.FirstOrDefault(x => x.Id == id);
+            return _instance.Contracts.FirstOrDefault(x => x.Id == id);
         }
 
         public async Task<Contract> GetItemAsyncByName(string title)
         {
-            return _instance.contracts.FirstOrDefault(x => x.Title == title);
+            return _instance.Contracts.FirstOrDefault(x => x.Title == title);
         }
 
         public async Task<IEnumerable<Contract>> GetItemsAsync()
         {
-            return _instance.contracts;
+            return _instance.Contracts;
         }
 
         public async Task<IEnumerable<Contract>> GetItemsAsync(int skip, int take)
         {
-            if (skip >= _instance.contracts.Count)
+            int count = _instance.Contracts.Count();
+
+            if (skip >= count)
             {
                 return null;
             }
 
-            if ((skip + take) > _instance.contracts.Count)
+            if ((skip + take) > count)
             {
-                take = _instance.contracts.Count - skip;
+                take = count - skip;
             }
 
-            var contracts = GetSomeItems(skip, take);
+            var contracts = _instance.Contracts.Skip(skip).Take(take).ToList();
 
             return contracts;
         }
 
         public async Task<bool> RemoveAsync(Guid id)
         {
-            Contract? contract = _instance.contracts.FirstOrDefault(x => x.Id == id);
+            Contract? contract = _instance.Contracts.FirstOrDefault(x => x.Id == id);
 
             if (contract is not null)
             {
-                _instance.contracts.Remove(contract);
+                _instance.Contracts.Remove(contract);
+
+                await _instance.SaveChangesAsync();
 
                 return true;
             }
@@ -72,26 +76,18 @@ namespace TimeSheets.Data.Implementation
 
         public async Task<bool> UpdateAsync(Contract item)
         {
-            Contract? contract = _instance.contracts.FirstOrDefault(x => x.Id == item.Id);
+            Contract? contract = _instance.Contracts.FirstOrDefault(x => x.Id == item.Id);
 
             if (contract == null)
             {
                 return false;
             }
 
-            _instance.contracts.Remove(contract);
+            _instance.Contracts.Update(contract);
 
-            _instance.contracts.Add(item);
+            await _instance.SaveChangesAsync();
 
             return true;
-        }
-
-        private IEnumerable<Contract> GetSomeItems(int skip, int take)
-        {
-            for (int i = skip; i < skip + take; i++)
-            {
-                yield return _instance.contracts[i];
-            }
         }
     }
 }

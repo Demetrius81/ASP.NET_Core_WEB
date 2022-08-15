@@ -6,9 +6,9 @@ namespace TimeSheets.Data.Implementation
 {
     public class ServiceRepo : IServiceRepo
     {
-        private readonly TempData _instance;
+        private readonly TimeSheetDbContext _instance;
 
-        public ServiceRepo(TempData instance)
+        public ServiceRepo(TimeSheetDbContext instance)
         {
             _instance = instance;
         }
@@ -20,50 +20,56 @@ namespace TimeSheets.Data.Implementation
                 return false;
             }
 
-            _instance.services.Add(Item);
+            await _instance.Services.AddAsync(Item);
+
+            await _instance.SaveChangesAsync();
 
             return true;
         }
 
         public async Task<Service> GetItemAsync(Guid id)
         {
-            return _instance.services.FirstOrDefault(x => x.Id == id);
+            return _instance.Services.FirstOrDefault(x => x.Id == id);
         }
 
         public async Task<Service> GetItemAsyncByName(string name)
         {
-            return _instance.services.FirstOrDefault(x => x.Name == name);
+            return _instance.Services.FirstOrDefault(x => x.Name == name);
         }
 
         public async Task<IEnumerable<Service>> GetItemsAsync()
         {
-            return _instance.services;
+            return _instance.Services;
         }
 
         public async Task<IEnumerable<Service>> GetItemsAsync(int skip, int take)
         {
-            if (skip >= _instance.services.Count)
+            int count = _instance.Services.Count();
+
+            if (skip >= count)
             {
                 return null;
             }
 
-            if ((skip + take) > _instance.services.Count)
+            if ((skip + take) > count)
             {
-                take = _instance.services.Count - skip;
+                take = count - skip;
             }
 
-            var services = GetSomeItems(skip, take);
+            List<Service> services = _instance.Services.Skip(skip).Take(take).ToList();
 
             return services;
         }
 
         public async Task<bool> RemoveAsync(Guid id)
         {
-            Service? service = _instance.services.FirstOrDefault(x => x.Id == id);
+            Service? service = _instance.Services.FirstOrDefault(x => x.Id == id);
 
             if (service is not null)
             {
-                _instance.services.Remove(service);
+                _instance.Services.Remove(service);
+
+                await _instance.SaveChangesAsync(true);
 
                 return true;
             }
@@ -73,26 +79,18 @@ namespace TimeSheets.Data.Implementation
 
         public async Task<bool> UpdateAsync(Service item)
         {
-            Service? service = _instance.services.FirstOrDefault(x => x.Id == item.Id);
+            Service? service = _instance.Services.FirstOrDefault(x => x.Id == item.Id);
 
             if (service == null)
             {
                 return false;
             }
 
-            _instance.services.Remove(service);
+            _instance.Services.Update(service);
 
-            _instance.services.Add(item);
+            await _instance.SaveChangesAsync(true);
 
             return true;
-        }
-
-        private IEnumerable<Service> GetSomeItems(int skip, int take)
-        {
-            for (int i = skip; i < skip + take; i++)
-            {
-                yield return _instance.services[i];
-            }
         }
     }
 }

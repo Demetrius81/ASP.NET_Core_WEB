@@ -5,9 +5,9 @@ namespace TimeSheets.Data.Implementation
 {
     public class SheetRepo : ISheetRepo
     {
-        private readonly TempData _instance;
+        private readonly TimeSheetDbContext _instance;
 
-        public SheetRepo(TempData instance)
+        public SheetRepo(TimeSheetDbContext instance)
         {
             _instance = instance;
         }
@@ -19,50 +19,54 @@ namespace TimeSheets.Data.Implementation
                 return false;
             }
 
-            _instance.sheets.Add(Item);
+            await _instance.Sheets.AddAsync(Item);
 
             return true;
         }
 
         public async Task<Sheet> GetItemAsync(Guid id)
         {
-            return _instance.sheets.FirstOrDefault(x => x.Id == id);
+            return _instance.Sheets.FirstOrDefault(x => x.Id == id);
         }
 
         public async Task<Sheet> GetItemAsyncByDate(DateTime date)
         {
-            return _instance.sheets.FirstOrDefault(x => x.Date == date);
+            return _instance.Sheets.FirstOrDefault(x => x.Date == date);
         }
 
         public async Task<IEnumerable<Sheet>> GetItemsAsync()
         {
-            return _instance.sheets;
+            return _instance.Sheets;
         }
 
         public async Task<IEnumerable<Sheet>> GetItemsAsync(int skip, int take)
         {
-            if (skip >= _instance.sheets.Count)
+            int count = _instance.Sheets.Count();
+
+            if (skip >= count)
             {
                 return null;
             }
 
-            if ((skip + take) > _instance.sheets.Count)
+            if ((skip + take) > count)
             {
-                take = _instance.sheets.Count - skip;
+                take = count - skip;
             }
 
-            var sheets = GetSomeItems(skip, take);
+            var sheets = _instance.Sheets.Skip(skip).Take(take).ToList();
 
             return sheets;
         }
 
         public async Task<bool> RemoveAsync(Guid id)
         {
-            Sheet? sheet = _instance.sheets.FirstOrDefault(x => x.Id == id);
+            Sheet? sheet = _instance.Sheets.FirstOrDefault(x => x.Id == id);
 
             if (sheet is not null)
             {
-                _instance.sheets.Remove(sheet);
+                _instance.Sheets.Remove(sheet);
+
+                await _instance.SaveChangesAsync();
 
                 return true;
             }
@@ -72,26 +76,18 @@ namespace TimeSheets.Data.Implementation
 
         public async Task<bool> UpdateAsync(Sheet item)
         {
-            Sheet? sheet = _instance.sheets.FirstOrDefault(x => x.Id == item.Id);
+            Sheet? sheet = _instance.Sheets.FirstOrDefault(x => x.Id == item.Id);
 
             if (sheet == null)
             {
                 return false;
             }
 
-            _instance.sheets.Remove(sheet);
+            _instance.Sheets.Update(sheet);
 
-            _instance.sheets.Add(item);
+            await _instance.SaveChangesAsync();
 
             return true;
-        }
-
-        private IEnumerable<Sheet> GetSomeItems(int skip, int take)
-        {
-            for (int i = skip; i < skip + take; i++)
-            {
-                yield return _instance.sheets[i];
-            }
         }
     }
 }

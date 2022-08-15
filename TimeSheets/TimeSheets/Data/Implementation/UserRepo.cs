@@ -19,8 +19,9 @@ namespace TimeSheets.Data.Implementation
                 return false;
             }
 
-            _instance.Users.Add(Item);
-            _instance.SaveChanges();
+            await _instance.Users.AddAsync(Item);
+
+            await _instance.SaveChangesAsync();
 
             return true;
         }
@@ -43,6 +44,7 @@ namespace TimeSheets.Data.Implementation
         public async Task<IEnumerable<User>> GetItemsAsync(int skip, int take)
         {
             int count = _instance.Users.Count();
+
             if (skip >= count)
             {
                 return null;
@@ -53,7 +55,7 @@ namespace TimeSheets.Data.Implementation
                 take = count - skip;
             }
 
-            var users = GetSomeItems(skip, take);
+            List<User> users = _instance.Users.Skip(skip).Take(take).ToList();
 
             return users;
         }
@@ -65,6 +67,8 @@ namespace TimeSheets.Data.Implementation
             if (user is not null)
             {
                 _instance.Users.Remove(user);
+
+                await _instance.SaveChangesAsync(true);
 
                 return true;
             }
@@ -83,17 +87,9 @@ namespace TimeSheets.Data.Implementation
 
             _instance.Users.Update(user);
 
+            await _instance.SaveChangesAsync(true);
+
             return true;
-        }
-
-        private IEnumerable<User> GetSomeItems(int skip, int take)
-        {
-            List<User> users = _instance.Users.ToList();
-
-            for (int i = skip; i < skip + take; i++)
-            {
-                yield return users[i];
-            }
         }
     }
 }

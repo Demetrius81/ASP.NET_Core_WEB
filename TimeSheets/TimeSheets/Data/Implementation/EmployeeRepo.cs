@@ -5,9 +5,9 @@ namespace TimeSheets.Data.Implementation
 {
     public class EmployeeRepo : IEmployeeRepo
     {
-        private readonly TempData _instance;
+        private readonly TimeSheetDbContext _instance;
 
-        public EmployeeRepo(TempData instance)
+        public EmployeeRepo(TimeSheetDbContext instance)
         {
             _instance = instance;
         }
@@ -19,50 +19,56 @@ namespace TimeSheets.Data.Implementation
                 return false;
             }
 
-            _instance.employes.Add(Item);
+            await _instance.Employees.AddAsync(Item);
+
+            await _instance.SaveChangesAsync();
 
             return true;
         }
 
         public async Task<Employee> GetItemAsync(Guid id)
         {
-            return _instance.employes.FirstOrDefault(x => x.Id == id);
+            return _instance.Employees.FirstOrDefault(x => x.Id == id);
         }
 
         public async Task<Employee> GetItemByUserIdAsync(Guid userId)
         {
-            return _instance.employes.FirstOrDefault(x => x.UserId == userId);
+            return _instance.Employees.FirstOrDefault(x => x.UserId == userId);
         }
 
         public async Task<IEnumerable<Employee>> GetItemsAsync()
         {
-            return _instance.employes;
+            return _instance.Employees;
         }
 
         public async Task<IEnumerable<Employee>> GetItemsAsync(int skip, int take)
         {
-            if (skip >= _instance.employes.Count)
+            int count = _instance.Users.Count();
+
+            if (skip >= count)
             {
                 return null;
             }
 
-            if ((skip + take) > _instance.employes.Count)
+            if ((skip + take) > count)
             {
-                take = _instance.employes.Count - skip;
+                take = count - skip;
             }
 
-            var employees = GetSomeItems(skip, take);
+            var employees = _instance.Employees.Skip(skip).Take(take).ToList();
 
             return employees;
         }
 
         public async Task<bool> RemoveAsync(Guid id)
         {
-            Employee? employee = _instance.employes.FirstOrDefault(x => x.Id == id);
+            Employee? employee = _instance.Employees.FirstOrDefault(x => x.Id == id);
 
             if (employee is not null)
             {
-                _instance.employes.Remove(employee);
+                _instance.Employees.Remove(employee);
+
+                await _instance.SaveChangesAsync();
 
                 return true;
             }
@@ -72,26 +78,18 @@ namespace TimeSheets.Data.Implementation
 
         public async Task<bool> UpdateAsync(Employee item)
         {
-            Employee? employee = _instance.employes.FirstOrDefault(x => x.Id == item.Id);
+            Employee? employee = _instance.Employees.FirstOrDefault(x => x.Id == item.Id);
 
             if (employee == null)
             {
                 return false;
             }
 
-            _instance.employes.Remove(employee);
+            _instance.Employees.Update(employee);
 
-            _instance.employes.Add(item);
+            await _instance.SaveChangesAsync();
 
             return true;
-        }
-
-        private IEnumerable<Employee> GetSomeItems(int skip, int take)
-        {
-            for (int i = skip; i < skip + take; i++)
-            {
-                yield return _instance.employes[i];
-            }
         }
     }
 }
