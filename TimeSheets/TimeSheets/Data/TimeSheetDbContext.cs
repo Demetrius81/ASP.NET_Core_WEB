@@ -19,11 +19,36 @@ namespace TimeSheets.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>().ToTable("Users");
-            modelBuilder.Entity<Client>().ToTable("Clients");
-            modelBuilder.Entity<Employee>().ToTable("Employees");
-            modelBuilder.Entity<Contract>().ToTable("Contracts");
-            modelBuilder.Entity<Sheet>().ToTable("Sheets");
-            modelBuilder.Entity<Service>().ToTable("Services");
+            //modelBuilder.Entity<Service>().ToTable("Services");
+            //modelBuilder.Entity<Client>().ToTable("Clients");
+            //modelBuilder.Entity<Employee>().ToTable("Employees");
+            //modelBuilder.Entity<Contract>().ToTable("Contracts");
+            //modelBuilder.Entity<Sheet>().ToTable("Sheets");
+
+            modelBuilder.Entity<Service>().HasOne(service => service.Contract)
+                .WithMany(contract => contract.Services)
+                .HasForeignKey("ContractId");
+
+            modelBuilder.Entity<Employee>().HasOne(employee => employee.User);
+
+            modelBuilder.Entity<Client>().HasOne(client => client.User);
+
+            modelBuilder.Entity<Contract>().HasOne(contract => contract.Client)
+                .WithMany(client => client.Contracts)
+                .HasForeignKey("ClientId");
+
+            modelBuilder.Entity<Sheet>().HasOne(sheet => sheet.Contract)
+                .WithMany(contract => contract.Sheets)
+                .HasForeignKey("ContractId");
+
+            modelBuilder.Entity<Sheet>().HasOne(sheet => sheet.Service)
+                .WithMany(service => service.Sheets)
+                .HasForeignKey("ServiceId");
+
+            modelBuilder.Entity<Sheet>().HasOne(sheet => sheet.Employee)
+                .WithMany(employee => employee.Sheets)
+                .HasForeignKey("EmployeeId");
+
         }
     }
 }

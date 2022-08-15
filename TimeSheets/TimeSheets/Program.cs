@@ -19,10 +19,10 @@ builder.Services.AddSwaggerGen();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-//builder.Services.AddDbContext<TimeSheetDbContext>(options =>
-//    options.UseNpgsql(connectionString)); 
+builder.Services.AddDbContext<TimeSheetDbContext>(options =>
+    options.UseNpgsql(connectionString)); 
 
-builder.Services.AddSingleton(typeof(TempData));   //Temprary item
+//builder.Services.AddSingleton(typeof(TempData));   //Temprary item
 
 //Repositories
 
