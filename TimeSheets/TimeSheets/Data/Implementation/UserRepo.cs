@@ -5,9 +5,9 @@ namespace TimeSheets.Data.Implementation
 {
     public class UserRepo : IUserRepo
     {
-        private readonly TempData _instance;
+        private readonly TimeSheetDbContext _instance;
 
-        public UserRepo(TempData instance)
+        public UserRepo(TimeSheetDbContext instance)
         {
             _instance = instance;
         }
@@ -19,36 +19,38 @@ namespace TimeSheets.Data.Implementation
                 return false;
             }
 
-            _instance.users.Add(Item);
+            _instance.Users.Add(Item);
+            _instance.SaveChanges();
 
             return true;
         }
 
         public async Task<User> GetItemAsync(Guid id)
         {
-            return _instance.users.FirstOrDefault(x => x.Id == id);
+            return _instance.Users.FirstOrDefault(x => x.Id == id);
         }
 
         public async Task<User> GetItemAsyncByName(string name)
         {
-            return _instance.users.FirstOrDefault(x=>x.UserName == name);
+            return _instance.Users.FirstOrDefault(x=>x.UserName == name);
         }
 
         public async Task<IEnumerable<User>> GetItemsAsync()
         {
-            return _instance.users;
+            return _instance.Users.ToList();
         }
 
         public async Task<IEnumerable<User>> GetItemsAsync(int skip, int take)
         {
-            if (skip >= _instance.users.Count)
+            int count = _instance.Users.Count();
+            if (skip >= count)
             {
                 return null;
             }
 
-            if ((skip + take) > _instance.users.Count)
+            if ((skip + take) > count)
             {
-                take = _instance.users.Count - skip;
+                take = count - skip;
             }
 
             var users = GetSomeItems(skip, take);
@@ -58,11 +60,11 @@ namespace TimeSheets.Data.Implementation
 
         public async Task<bool> RemoveAsync(Guid id)
         {
-            User? user = _instance.users.FirstOrDefault(x => x.Id == id);
+            User? user = _instance.Users.FirstOrDefault(x => x.Id == id);
 
             if (user is not null)
             {
-                _instance.users.Remove(user);
+                _instance.Users.Remove(user);
 
                 return true;
             }
@@ -72,25 +74,25 @@ namespace TimeSheets.Data.Implementation
 
         public async Task<bool> UpdateAsync(User item)
         {
-            User? user = _instance.users.FirstOrDefault(x => x.Id == item.Id);
+            User? user = _instance.Users.FirstOrDefault(x => x.Id == item.Id);
 
             if (user == null)
             {
                 return false;
             }
 
-            _instance.users.Remove(user);
-
-            _instance.users.Add(item);
+            _instance.Users.Update(user);
 
             return true;
         }
 
         private IEnumerable<User> GetSomeItems(int skip, int take)
         {
+            List<User> users = _instance.Users.ToList();
+
             for (int i = skip; i < skip + take; i++)
             {
-                yield return _instance.users[i];
+                yield return users[i];
             }
         }
     }
