@@ -14,11 +14,14 @@ namespace TimeSheets.Controllers
     public class SheetsController : ControllerBase
     {
         private readonly ISheetManager _sheetManager;
+        private readonly IContractManager _contractManager;
 
-        public SheetsController(ISheetManager sheetManager)
+        public SheetsController(ISheetManager sheetManager, IContractManager contractManager)
         {
             _sheetManager = sheetManager;
+            _contractManager = contractManager;
         }
+               
 
         /// <summary>
         /// Метод добавляет табель
@@ -28,11 +31,18 @@ namespace TimeSheets.Controllers
         [HttpPost("add")]
         public async Task<IActionResult> Add([FromBody] SheetRequest request)
         {
+            bool? isActive = await _contractManager.CheckContractIsActiveAsync(request.ContractId);
+
+            if (isActive != null && (bool)isActive)
+            {
+                return BadRequest($"Contract {request.ContractId} is not active or not found");
+            }
+
             Guid response = await _sheetManager.AddItemAsync(request);
 
             if (response == default)
             {
-                return BadRequest();
+                return BadRequest($"Something wrong");
             }
 
             return Ok(response);
@@ -101,6 +111,13 @@ namespace TimeSheets.Controllers
         [HttpPut("update")]
         public async Task<IActionResult> Update([FromBody] SheetRequest request)
         {
+            bool? isActive = await _contractManager.CheckContractIsActiveAsync(request.ContractId);
+
+            if (isActive != null && (bool)isActive)
+            {
+                return BadRequest($"Contract {request.ContractId} is not active or not found");
+            }
+
             bool flag = await _sheetManager.UpdateItemAsync(request);
 
             if (flag)

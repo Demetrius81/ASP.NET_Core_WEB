@@ -74,5 +74,10 @@ namespace TimeSheets.Services.Implementation
 
             return flag;
         }
+
+        public async Task<bool?> CheckContractIsActiveAsync(Guid contractId)
+        {
+            return await _contractRepo.CheckContractIsActiveAsync(contractId);
+        }
     }
 }

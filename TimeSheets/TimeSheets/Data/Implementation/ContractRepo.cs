@@ -24,6 +24,17 @@ namespace TimeSheets.Data.Implementation
             return true;
         }
 
+        public async Task<bool?> CheckContractIsActiveAsync(Guid contractId)
+        {
+            Contract? contract = await _instance.Contracts.FindAsync(contractId);
+
+            DateTime dateNow = DateTime.Now;
+
+            bool? isActive = dateNow <= contract?.DateEnd && dateNow >= contract?.DateStart;
+
+            return isActive;
+        }
+
         public async Task<Contract> GetItemAsync(Guid id)
         {
             return _instance.Contracts.FirstOrDefault(x => x.Id == id);

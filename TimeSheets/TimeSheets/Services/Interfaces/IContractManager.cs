@@ -13,5 +13,6 @@ namespace TimeSheets.Services.Interfaces
         Task<Guid> AddItemAsync(ContractRequest request);
         Task<bool> UpdateItemAsync(ContractRequest request);
         Task<bool> DeleteItemAsync(Guid id);
+        Task<bool?> CheckContractIsActiveAsync(Guid contractId);
     }
 }
