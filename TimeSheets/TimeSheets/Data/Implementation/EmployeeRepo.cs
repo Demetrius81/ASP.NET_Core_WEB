@@ -5,41 +5,91 @@ namespace TimeSheets.Data.Implementation
 {
     public class EmployeeRepo : IEmployeeRepo
     {
-        private readonly TempData _instance;
+        private readonly TimeSheetDbContext _instance;
 
-        public EmployeeRepo(TempData instance)
+        public EmployeeRepo(TimeSheetDbContext instance)
         {
             _instance = instance;
         }
 
-        public bool Add(Employee Item)
+        public async Task<bool> AddAsync(Employee Item)
         {
-            throw new NotImplementedException();
+            if (Item == null)
+            {
+                return false;
+            }
+
+            await _instance.Employees.AddAsync(Item);
+
+            await _instance.SaveChangesAsync();
+
+            return true;
         }
 
-        public Employee GetItem(Guid id)
+        public async Task<Employee> GetItemAsync(Guid id)
         {
-            throw new NotImplementedException();
+            return _instance.Employees.FirstOrDefault(x => x.Id == id);
         }
 
-        public IEnumerable<Employee> GetItems()
+        public async Task<Employee> GetItemByUserIdAsync(Guid userId)
         {
-            throw new NotImplementedException();
+            return _instance.Employees.FirstOrDefault(x => x.UserId == userId);
         }
 
-        public IEnumerable<Employee> GetItems(int skip, int take)
+        public async Task<IEnumerable<Employee>> GetItemsAsync()
         {
-            throw new NotImplementedException();
+            return _instance.Employees;
         }
 
-        public bool Remove(Guid id)
+        public async Task<IEnumerable<Employee>> GetItemsAsync(int skip, int take)
         {
-            throw new NotImplementedException();
+            int count = _instance.Users.Count();
+
+            if (skip >= count)
+            {
+                return null;
+            }
+
+            if ((skip + take) > count)
+            {
+                take = count - skip;
+            }
+
+            var employees = _instance.Employees.Skip(skip).Take(take).ToList();
+
+            return employees;
         }
 
-        public bool Update(Employee item)
+        public async Task<bool> RemoveAsync(Guid id)
         {
-            throw new NotImplementedException();
+            Employee? employee = _instance.Employees.FirstOrDefault(x => x.Id == id);
+
+            if (employee is not null)
+            {
+                _instance.Employees.Remove(employee);
+
+                await _instance.SaveChangesAsync();
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public async Task<bool> UpdateAsync(Employee item)
+        {
+            Employee? employee = _instance.Employees.FirstOrDefault(x => x.Id == item.Id);
+
+            if (employee == null)
+            {
+                return false;
+            }
+
+            _instance.Employees.Update(employee);
+
+            await _instance.SaveChangesAsync();
+
+            return true;
         }
     }
 }

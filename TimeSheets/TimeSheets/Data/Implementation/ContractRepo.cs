@@ -5,41 +5,100 @@ namespace TimeSheets.Data.Implementation
 {
     public class ContractRepo : IContractRepo
     {
-        private readonly TempData _instance;
+        private readonly TimeSheetDbContext _instance;
 
-        public ContractRepo(TempData instance)
+        public ContractRepo(TimeSheetDbContext instance)
         {
             _instance = instance;
         }
 
-        public bool Add(Contract Item)
+        public async Task<bool> AddAsync(Contract Item)
         {
-            throw new NotImplementedException();
+            if (Item == null)
+            {
+                return false;
+            }
+
+            await _instance.Contracts.AddAsync(Item);
+
+            return true;
         }
 
-        public Contract GetItem(Guid id)
+        public async Task<bool?> CheckContractIsActiveAsync(Guid contractId)
         {
-            throw new NotImplementedException();
+            Contract? contract = await _instance.Contracts.FindAsync(contractId);
+
+            DateTime dateNow = DateTime.Now;
+
+            bool? isActive = dateNow <= contract?.DateEnd && dateNow >= contract?.DateStart;
+
+            return isActive;
         }
 
-        public IEnumerable<Contract> GetItems()
+        public async Task<Contract> GetItemAsync(Guid id)
         {
-            throw new NotImplementedException();
+            return _instance.Contracts.FirstOrDefault(x => x.Id == id);
         }
 
-        public IEnumerable<Contract> GetItems(int skip, int take)
+        public async Task<Contract> GetItemAsyncByName(string title)
         {
-            throw new NotImplementedException();
+            return _instance.Contracts.FirstOrDefault(x => x.Title == title);
         }
 
-        public bool Remove(Guid id)
+        public async Task<IEnumerable<Contract>> GetItemsAsync()
         {
-            throw new NotImplementedException();
+            return _instance.Contracts;
         }
 
-        public bool Update(Contract item)
+        public async Task<IEnumerable<Contract>> GetItemsAsync(int skip, int take)
         {
-            throw new NotImplementedException();
+            int count = _instance.Contracts.Count();
+
+            if (skip >= count)
+            {
+                return null;
+            }
+
+            if ((skip + take) > count)
+            {
+                take = count - skip;
+            }
+
+            var contracts = _instance.Contracts.Skip(skip).Take(take).ToList();
+
+            return contracts;
+        }
+
+        public async Task<bool> RemoveAsync(Guid id)
+        {
+            Contract? contract = _instance.Contracts.FirstOrDefault(x => x.Id == id);
+
+            if (contract is not null)
+            {
+                _instance.Contracts.Remove(contract);
+
+                await _instance.SaveChangesAsync();
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public async Task<bool> UpdateAsync(Contract item)
+        {
+            Contract? contract = _instance.Contracts.FirstOrDefault(x => x.Id == item.Id);
+
+            if (contract == null)
+            {
+                return false;
+            }
+
+            _instance.Contracts.Update(contract);
+
+            await _instance.SaveChangesAsync();
+
+            return true;
         }
     }
 }

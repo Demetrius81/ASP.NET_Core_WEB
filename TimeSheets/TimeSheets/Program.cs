@@ -1,8 +1,10 @@
+using Microsoft.EntityFrameworkCore;
 using TimeSheets.Data;
 using TimeSheets.Data.Implementation;
 using TimeSheets.Data.Interfaces;
 using TimeSheets.Services.Implementation;
 using TimeSheets.Services.Interfaces;
+using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,15 +15,32 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-//builder.Services.AddScoped<ISheetRepo, SheetRepo>();
+//Data
 
-builder.Services.AddSingleton(typeof(TempData));   //Temprary item
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+builder.Services.AddDbContext<TimeSheetDbContext>(options =>
+    options.UseNpgsql(connectionString)); 
+
+//builder.Services.AddSingleton(typeof(TempData));   //Temprary item
+
+//Repositories
 
 builder.Services.AddScoped<IUserRepo, UserRepo>();
+builder.Services.AddScoped<IClientRepo, ClientRepo>();
+builder.Services.AddScoped<IEmployeeRepo, EmployeeRepo>();
+builder.Services.AddScoped<IContractRepo, ContractRepo>();
+builder.Services.AddScoped<IServiceRepo, ServiceRepo>();
+builder.Services.AddScoped<ISheetRepo, SheetRepo>();
 
-//builder.Services.AddScoped<ISheetManager, SheetManager>();
+//Managers
 
 builder.Services.AddScoped<IUserManager, UserManager>();
+builder.Services.AddScoped<IClientManager, ClientManager>();
+builder.Services.AddScoped<IEmployeeManager, EmployeeManager>();
+builder.Services.AddScoped<IContractManager, ContractManager>();
+builder.Services.AddScoped<ISerrviceManager, ServiceManager>();
+builder.Services.AddScoped<ISheetManager, SheetManager>();
 
 var app = builder.Build();
 

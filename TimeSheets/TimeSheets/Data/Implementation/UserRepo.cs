@@ -5,59 +5,70 @@ namespace TimeSheets.Data.Implementation
 {
     public class UserRepo : IUserRepo
     {
-        private readonly TempData _instance;
+        private readonly TimeSheetDbContext _instance;
 
-        public UserRepo(TempData instance)
+        public UserRepo(TimeSheetDbContext instance)
         {
             _instance = instance;
         }
 
-        public bool Add(User Item)
+        public async Task<bool> AddAsync(User Item)
         {
             if (Item == null)
             {
                 return false;
             }
 
-            _instance.users.Add(Item);
+            await _instance.Users.AddAsync(Item);
+
+            await _instance.SaveChangesAsync();
 
             return true;
         }
 
-        public User GetItem(Guid id)
+        public async Task<User> GetItemAsync(Guid id)
         {
-            return _instance.users.FirstOrDefault(x => x.Id == id);
+            return _instance.Users.FirstOrDefault(x => x.Id == id);
         }
 
-        public IEnumerable<User> GetItems()
+        public async Task<User> GetItemAsyncByName(string name)
         {
-            return _instance.users;
+            return _instance.Users.FirstOrDefault(x=>x.UserName == name);
         }
 
-        public IEnumerable<User> GetItems(int skip, int take)
+        public async Task<IEnumerable<User>> GetItemsAsync()
         {
-            if (skip >= _instance.users.Count)
+            return _instance.Users.ToList();
+        }
+
+        public async Task<IEnumerable<User>> GetItemsAsync(int skip, int take)
+        {
+            int count = _instance.Users.Count();
+
+            if (skip >= count)
             {
                 return null;
             }
 
-            if ((skip + take) > _instance.users.Count)
+            if ((skip + take) > count)
             {
-                take = _instance.users.Count - skip;
+                take = count - skip;
             }
 
-            var users = GetSomeItems(skip, take);
+            List<User> users = _instance.Users.Skip(skip).Take(take).ToList();
 
             return users;
         }
 
-        public bool Remove(Guid id)
+        public async Task<bool> RemoveAsync(Guid id)
         {
-            User? user = _instance.users.FirstOrDefault(x => x.Id == id);
+            User? user = _instance.Users.FirstOrDefault(x => x.Id == id);
 
             if (user is not null)
             {
-                _instance.users.Remove(user);
+                _instance.Users.Remove(user);
+
+                await _instance.SaveChangesAsync(true);
 
                 return true;
             }
@@ -65,28 +76,20 @@ namespace TimeSheets.Data.Implementation
             return false;
         }
 
-        public bool Update(User item)
+        public async Task<bool> UpdateAsync(User item)
         {
-            User? user = _instance.users.FirstOrDefault(x => x.Id == item.Id);
+            User? user = _instance.Users.FirstOrDefault(x => x.Id == item.Id);
 
             if (user == null)
             {
                 return false;
             }
 
-            _instance.users.Remove(user);
+            _instance.Users.Update(user);
 
-            _instance.users.Add(item);
+            await _instance.SaveChangesAsync(true);
 
             return true;
-        }
-
-        private IEnumerable<User> GetSomeItems(int skip, int take)
-        {
-            for (int i = skip; i < skip + take; i++)
-            {
-                yield return _instance.users[i];
-            }
         }
     }
 }

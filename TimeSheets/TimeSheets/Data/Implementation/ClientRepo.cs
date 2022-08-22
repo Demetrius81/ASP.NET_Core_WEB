@@ -5,41 +5,86 @@ namespace TimeSheets.Data.Implementation
 {
     public class ClientRepo : IClientRepo
     {
-        private readonly TempData _instance;
+        private readonly TimeSheetDbContext _instance;
 
-        public ClientRepo(TempData instance)
+        public ClientRepo(TimeSheetDbContext instance)
         {
             _instance = instance;
         }
 
-        public bool Add(Client Item)
+        public async Task<bool> AddAsync(Client Item)
         {
-            throw new NotImplementedException();
+            if (Item == null)
+            {
+                return false;
+            }
+
+            await _instance.Clients.AddAsync(Item);
+
+            await _instance.SaveChangesAsync();
+
+            return true;
         }
 
-        public Client GetItem(Guid id)
+        public async Task<Client> GetItemAsync(Guid id)
         {
-            throw new NotImplementedException();
+            return _instance.Clients.FirstOrDefault(x => x.Id == id);
         }
 
-        public IEnumerable<Client> GetItems()
+        public async Task<IEnumerable<Client>> GetItemsAsync()
         {
-            throw new NotImplementedException();
+            return _instance.Clients;
         }
 
-        public IEnumerable<Client> GetItems(int skip, int take)
+        public async Task<IEnumerable<Client>> GetItemsAsync(int skip, int take)
         {
-            throw new NotImplementedException();
+            int count = _instance.Clients.Count();
+
+            if (skip >= count)
+            {
+                return null;
+            }
+
+            if ((skip + take) > count)
+            {
+                take = count;
+            }
+
+            var clients = _instance.Clients.Skip(skip).Take(take).ToList();
+
+            return clients;
         }
 
-        public bool Remove(Guid id)
+        public async Task<bool> RemoveAsync(Guid id)
         {
-            throw new NotImplementedException();
+            Client? client = _instance.Clients.FirstOrDefault(x => x.Id == id);
+
+            if (client is not null)
+            {
+                _instance.Clients.Remove(client);
+
+                await _instance.SaveChangesAsync();
+
+                return true;
+            }
+
+            return false;
         }
 
-        public bool Update(Client item)
+        public async Task<bool> UpdateAsync(Client item)
         {
-            throw new NotImplementedException();
-        }
+            Client? client = _instance.Clients.FirstOrDefault(x => x.Id == item.Id);
+
+            if (client == null)
+            {
+                return false;
+            }
+
+            _instance.Clients.Update(client);
+
+            await _instance.SaveChangesAsync();
+
+            return true;
+        }        
     }
 }

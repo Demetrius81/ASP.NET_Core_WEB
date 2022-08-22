@@ -1,34 +1,34 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using TimeSheets.Models;
 using TimeSheets.Models.Dto;
 using TimeSheets.Services.Interfaces;
 
 namespace TimeSheets.Controllers
 {
     /// <summary>
-    /// Контроллер пользователей
+    /// Контроллер контрактов
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class ContractsController : ControllerBase
     {
-        private readonly IUserManager _userManager;
+        private readonly IContractManager _contractManager;
 
-        public UserController(IUserManager userManager)
+        public ContractsController(IContractManager contractManager)
         {
-            _userManager = userManager;
+            _contractManager = contractManager;
         }
 
         /// <summary>
-        /// Метод добавляет пользователя
+        /// Метод добавляет контракт
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("add")]
-        public IActionResult Add([FromBody] UserRequest request)
-        { 
-            Guid response = _userManager.AddItem(request);
-           
+        public async Task<IActionResult> Add([FromBody] ContractRequest request)
+        {
+            Guid response = await _contractManager.AddItemAsync(request);
 
             if (response == default)
             {
@@ -39,14 +39,14 @@ namespace TimeSheets.Controllers
         }
 
         /// <summary>
-        /// Метод возвращает пользователя по идентификатору
+        /// Метод возвращает контракт по идентификатору
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("id/{id:Guid}")]
-        public IActionResult Get([FromRoute] Guid id)
+        [HttpGet("get/{id:Guid}")]
+        public async Task<IActionResult> Get([FromRoute] Guid id)
         {
-            var user = _userManager.GetItem(id);
+            Contract user = await _contractManager.GetItemAsync(id);
 
             if (user == null)
             {
@@ -57,14 +57,14 @@ namespace TimeSheets.Controllers
         }
 
         /// <summary>
-        /// Метод возвращает пользователя по имени пользователя
+        /// Метод возвращает контракт по названию
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
         [HttpGet("search/{name}")]
-        public IActionResult Get([FromRoute] string name)
+        public async Task<IActionResult> Get([FromRoute] string name)
         {
-            var user = _userManager.GetItem(name);
+            Contract user = await _contractManager.GetItemAsync(name);
 
             if (user == null)
             {
@@ -75,15 +75,15 @@ namespace TimeSheets.Controllers
         }
 
         /// <summary>
-        /// Метод возвращает коллекцию пользователей в указанном количестве, при этом пропускает указанное количество
+        /// Метод возвращает коллекцию контрактов в указанном количестве, при этом пропускает указанное количество
         /// </summary>
         /// <param name="skip">Сколько пропустить</param>
         /// <param name="take">Сколько вывести</param>
         /// <returns></returns>
         [HttpGet("skip/{skip:int}/take/{take:int}")]
-        public IActionResult Get([FromRoute] int skip = 5, int take = 10)
+        public async Task<IActionResult> Get([FromRoute] int skip = 5, int take = 10)
         {
-            var users = _userManager.GetItems(skip, take);
+            IEnumerable<Contract> users = await _contractManager.GetItemsAsync(skip, take);
 
             if (users == null)
             {
@@ -94,14 +94,14 @@ namespace TimeSheets.Controllers
         }
 
         /// <summary>
-        /// Метод обновляет данные пользователя
+        /// Метод обновляет данные контракта
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPut("update")]
-        public IActionResult Update([FromBody] UserRequest request)
+        public async Task<IActionResult> Update([FromBody] ContractRequest request)
         {
-            bool flag = _userManager.UpdateItem(request);
+            bool flag = await _contractManager.UpdateItemAsync(request);
 
             if (flag)
             {
@@ -112,14 +112,14 @@ namespace TimeSheets.Controllers
         }
 
         /// <summary>
-        /// Метод удаляет пользователя
+        /// Метод удаляет контракт
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("delete/{id:guid}")]
-        public IActionResult Delete([FromRoute] Guid id)
+        public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
-            bool flag = _userManager.DeleteItem(id);
+            bool flag = await _contractManager.DeleteItemAsync(id);
 
             if (flag)
             {
