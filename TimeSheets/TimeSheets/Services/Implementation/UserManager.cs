@@ -21,9 +21,11 @@ namespace TimeSheets.Services.Implementation
             return await _userRepo.GetItemAsync(id);
         }
 
+
+
         public async Task<User> GetItemAsync(string name)
         {
-            return await _userRepo.GetItemAsyncByName(name);
+            return await _userRepo.GetItemByNameAsync(name);
         }
 
         public async Task<IEnumerable<User>> GetItemsAsync(int skip, int take)
@@ -60,7 +62,7 @@ namespace TimeSheets.Services.Implementation
 
         public async Task<bool> UpdateItemAsync(UserRequest request)
         {
-            User? user = await _userRepo.GetItemAsyncByName(request.UserName);
+            User? user = await _userRepo.GetItemByNameAsync(request.UserName);
 
             if (user == null)
             {
@@ -88,5 +90,9 @@ namespace TimeSheets.Services.Implementation
             return await _userRepo.RemoveAsync(id);
         }
 
+        public async Task<User> GetItemAsync(LoginRequest request)
+        {
+            return await _userRepo.GetItemByLoginAndPasswordAsync(request.UserName, GetPasswordHash(request.Password));
+        }
     }
 }
