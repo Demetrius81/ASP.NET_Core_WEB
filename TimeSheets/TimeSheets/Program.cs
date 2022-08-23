@@ -11,6 +11,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.ConfigureDBContext(builder.Configuration);
 
+builder.Services.ConfigureAuthentication(builder.Configuration);
+
 builder.Services.ConfigureDataRepositories();
 
 builder.Services.ConfigureServiceManagers();
