@@ -1,12 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using TimeSheets.Data;
 using TimeSheets.Data.Implementation;
 using TimeSheets.Data.Interfaces;
 using TimeSheets.Services.Implementation;
 using TimeSheets.Services.Interfaces;
 
-namespace TimeSheets.Infrastucture
+namespace TimeSheets.Infrastucture.Extentions
 {
     public static class ServiceCollectionExtention
     {

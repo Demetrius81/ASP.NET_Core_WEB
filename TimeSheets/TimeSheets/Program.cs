@@ -1,11 +1,4 @@
-using Microsoft.EntityFrameworkCore;
-using TimeSheets.Data;
-using TimeSheets.Data.Implementation;
-using TimeSheets.Data.Interfaces;
-using TimeSheets.Services.Implementation;
-using TimeSheets.Services.Interfaces;
-using Microsoft.Extensions.Configuration;
-using TimeSheets.Infrastucture;
+using TimeSheets.Infrastucture.Extentions;
 
 WebApplicationBuilder? builder = WebApplication.CreateBuilder(args);
 
