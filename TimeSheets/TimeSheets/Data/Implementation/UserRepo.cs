@@ -32,7 +32,7 @@ namespace TimeSheets.Data.Implementation
             return _instance.Users.FirstOrDefault(x => x.Id == id);
         }
 
-        public async Task<User> GetItemByLoginAndPasswordAsync(string login, byte[] passwordHash)
+        public async Task<User> GetItemByLoginAndPasswordHashAsync(string login, byte[] passwordHash)
         {
             return await _instance.Users
                             .Where(x => x.UserName == login && x.PasswordHash == passwordHash)

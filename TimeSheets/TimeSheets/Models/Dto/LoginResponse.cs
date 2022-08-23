@@ -1,5 +1,8 @@
 ﻿namespace TimeSheets.Models.Dto
 {
+    /// <summary>
+    /// Информация об аутентификации пользователя
+    /// </summary>
     public class LoginResponse
     {
         public string AccessToken { get; set; }

@@ -21,17 +21,23 @@ namespace TimeSheets.Services.Implementation
             return await _userRepo.GetItemAsync(id);
         }
 
-
-
         public async Task<User> GetItemAsync(string name)
         {
             return await _userRepo.GetItemByNameAsync(name);
+        }
+
+        public async Task<User> GetItemAsync(LoginRequest request)
+        {
+            var passwordHash = GetPasswordHash(request.Password);
+
+            return await _userRepo.GetItemByLoginAndPasswordHashAsync(request.UserName, passwordHash);
         }
 
         public async Task<IEnumerable<User>> GetItemsAsync(int skip, int take)
         {
             return await _userRepo.GetItemsAsync(skip, take);
         }
+
         public async Task<Guid> AddItemAsync(UserRequest request)
         {
             User user = new User()
@@ -50,14 +56,6 @@ namespace TimeSheets.Services.Implementation
             bool flag = await _userRepo.AddAsync(user);
 
             return flag ? user.Id : default;
-        }
-
-        private static byte[] GetPasswordHash(string password)
-        {
-            using (var sha1 = new SHA1CryptoServiceProvider())
-            {
-                return sha1.ComputeHash(Encoding.Unicode.GetBytes(password));
-            }
         }
 
         public async Task<bool> UpdateItemAsync(UserRequest request)
@@ -90,9 +88,12 @@ namespace TimeSheets.Services.Implementation
             return await _userRepo.RemoveAsync(id);
         }
 
-        public async Task<User> GetItemAsync(LoginRequest request)
+        private static byte[] GetPasswordHash(string password)
         {
-            return await _userRepo.GetItemByLoginAndPasswordAsync(request.UserName, GetPasswordHash(request.Password));
+            using (var sha1 = new SHA1CryptoServiceProvider())
+            {
+                return sha1.ComputeHash(Encoding.Unicode.GetBytes(password));
+            }
         }
     }
 }

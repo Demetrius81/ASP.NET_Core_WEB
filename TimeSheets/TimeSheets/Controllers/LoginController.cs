@@ -30,6 +30,8 @@ namespace TimeSheets.Controllers
             }
 
             var loginResponse = await _loginManager.Authenticate(user);
+
+            return Ok(loginResponse);
         }
     }
 }
