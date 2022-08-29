@@ -36,7 +36,7 @@ namespace TimeSheets.Infrastucture.Extentions
             var connectionString = configuration.GetConnectionString("DefaultConnection");
 
             services.AddDbContext<TimeSheetDbContext>(options =>
-                        options.UseNpgsql(connectionString));
+                        options.UseNpgsql(connectionString/*, b=>b.MigrationsAssembly("TimeSheets")*/));
         }
 
         public static void ConfigureAuthentication(this IServiceCollection services, IConfiguration configuration)
