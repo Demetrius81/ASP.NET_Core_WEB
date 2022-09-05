@@ -1,4 +1,5 @@
-﻿using TimeSheets.Data.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using TimeSheets.Data.Interfaces;
 using TimeSheets.Models;
 
 namespace TimeSheets.Data.Implementation
@@ -31,7 +32,14 @@ namespace TimeSheets.Data.Implementation
             return _instance.Users.FirstOrDefault(x => x.Id == id);
         }
 
-        public async Task<User> GetItemAsyncByName(string name)
+        public async Task<User> GetItemByLoginAndPasswordHashAsync(string login, byte[] passwordHash)
+        {
+            return await _instance.Users
+                            .Where(x => x.UserName == login && x.PasswordHash == passwordHash)
+                            .FirstOrDefaultAsync();
+        }
+
+        public async Task<User> GetItemByNameAsync(string name)
         {
             return _instance.Users.FirstOrDefault(x=>x.UserName == name);
         }

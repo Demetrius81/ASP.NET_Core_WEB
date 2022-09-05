@@ -22,8 +22,7 @@ namespace TimeSheets.Services.Implementation
                 Title = request.Title,
                 DateStart = request.DateStart,
                 DateEnd = request.DateEnd,
-                Description = request.Description,
-                Services = request.Services
+                Description = request.Description                
             };
 
             bool flag = await _contractRepo.AddAsync(contract);
@@ -66,8 +65,7 @@ namespace TimeSheets.Services.Implementation
                 Title = request.Title,
                 DateStart = request.DateStart,
                 DateEnd = request.DateEnd,
-                Description = request.Description,
-                Services = request.Services
+                Description = request.Description
             };
 
             bool flag = await _contractRepo.UpdateAsync(contract);

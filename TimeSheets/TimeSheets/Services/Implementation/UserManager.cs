@@ -2,6 +2,8 @@
 using TimeSheets.Models;
 using TimeSheets.Models.Dto;
 using TimeSheets.Services.Interfaces;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace TimeSheets.Services.Implementation
 {
@@ -21,13 +23,21 @@ namespace TimeSheets.Services.Implementation
 
         public async Task<User> GetItemAsync(string name)
         {
-            return await _userRepo.GetItemAsyncByName(name);
+            return await _userRepo.GetItemByNameAsync(name);
+        }
+
+        public async Task<User> GetItemAsync(LoginRequest request)
+        {
+            var passwordHash = GetPasswordHash(request.Password);
+
+            return await _userRepo.GetItemByLoginAndPasswordHashAsync(request.UserName, passwordHash);
         }
 
         public async Task<IEnumerable<User>> GetItemsAsync(int skip, int take)
         {
             return await _userRepo.GetItemsAsync(skip, take);
         }
+
         public async Task<Guid> AddItemAsync(UserRequest request)
         {
             User user = new User()
@@ -38,7 +48,9 @@ namespace TimeSheets.Services.Implementation
                 LastName = request.LastName,
                 Email = request.Email,
                 Company = request.Company,
-                Age = request.Age
+                Age = request.Age,
+                PasswordHash = GetPasswordHash(request.Password),
+                Role = request.Role
             };
 
             bool flag = await _userRepo.AddAsync(user);
@@ -48,7 +60,7 @@ namespace TimeSheets.Services.Implementation
 
         public async Task<bool> UpdateItemAsync(UserRequest request)
         {
-            User? user = await _userRepo.GetItemAsyncByName(request.UserName);
+            User? user = await _userRepo.GetItemByNameAsync(request.UserName);
 
             if (user == null)
             {
@@ -76,5 +88,12 @@ namespace TimeSheets.Services.Implementation
             return await _userRepo.RemoveAsync(id);
         }
 
+        private static byte[] GetPasswordHash(string password)
+        {
+            using (var sha1 = new SHA1CryptoServiceProvider())
+            {
+                return sha1.ComputeHash(Encoding.Unicode.GetBytes(password));
+            }
+        }
     }
 }

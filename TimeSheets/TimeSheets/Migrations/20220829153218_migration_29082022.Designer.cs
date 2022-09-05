@@ -12,8 +12,8 @@ using TimeSheets.Data;
 namespace TimeSheets.Migrations
 {
     [DbContext(typeof(TimeSheetDbContext))]
-    [Migration("20220815150545_InitMigration")]
-    partial class InitMigration
+    [Migration("20220829153218_migration_29082022")]
+    partial class migration_29082022
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -30,6 +30,9 @@ namespace TimeSheets.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
@@ -37,7 +40,7 @@ namespace TimeSheets.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Clients");
+                    b.ToTable("Clients", (string)null);
                 });
 
             modelBuilder.Entity("TimeSheets.Models.Contract", b =>
@@ -59,6 +62,9 @@ namespace TimeSheets.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");
@@ -67,7 +73,7 @@ namespace TimeSheets.Migrations
 
                     b.HasIndex("ClientId");
 
-                    b.ToTable("Contracts");
+                    b.ToTable("Contracts", (string)null);
                 });
 
             modelBuilder.Entity("TimeSheets.Models.Employee", b =>
@@ -76,6 +82,9 @@ namespace TimeSheets.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
@@ -83,10 +92,10 @@ namespace TimeSheets.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Employees");
+                    b.ToTable("Employees", (string)null);
                 });
 
-            modelBuilder.Entity("TimeSheets.Models.Service", b =>
+            modelBuilder.Entity("TimeSheets.Models.Invoice", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -95,22 +104,42 @@ namespace TimeSheets.Migrations
                     b.Property<Guid>("ContractId")
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime>("DateEnd")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("DateStart")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("Sum")
+                        .HasColumnType("numeric");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContractId");
+
+                    b.ToTable("Invoices", (string)null);
+                });
+
+            modelBuilder.Entity("TimeSheets.Models.Service", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ContractId");
-
-                    b.ToTable("Services");
+                    b.ToTable("Services", (string)null);
                 });
 
             modelBuilder.Entity("TimeSheets.Models.Sheet", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("Id");
 
                     b.Property<int>("Amount")
                         .HasColumnType("integer");
@@ -124,6 +153,9 @@ namespace TimeSheets.Migrations
                     b.Property<Guid>("EmployeeId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("InvoiceId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("ServiceId")
                         .HasColumnType("uuid");
 
@@ -133,9 +165,11 @@ namespace TimeSheets.Migrations
 
                     b.HasIndex("EmployeeId");
 
+                    b.HasIndex("InvoiceId");
+
                     b.HasIndex("ServiceId");
 
-                    b.ToTable("Sheets");
+                    b.ToTable("Sheets", (string)null);
                 });
 
             modelBuilder.Entity("TimeSheets.Models.User", b =>
@@ -144,7 +178,7 @@ namespace TimeSheets.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<int>("Age")
+                    b.Property<int?>("Age")
                         .HasColumnType("integer");
 
                     b.Property<string>("Company")
@@ -159,7 +193,16 @@ namespace TimeSheets.Migrations
                     b.Property<string>("LastName")
                         .HasColumnType("text");
 
+                    b.Property<byte[]>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("UserName")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -200,10 +243,10 @@ namespace TimeSheets.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TimeSheets.Models.Service", b =>
+            modelBuilder.Entity("TimeSheets.Models.Invoice", b =>
                 {
                     b.HasOne("TimeSheets.Models.Contract", "Contract")
-                        .WithMany("Services")
+                        .WithMany()
                         .HasForeignKey("ContractId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -225,6 +268,12 @@ namespace TimeSheets.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("TimeSheets.Models.Invoice", "Invoice")
+                        .WithMany("Sheets")
+                        .HasForeignKey("InvoiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("TimeSheets.Models.Service", "Service")
                         .WithMany("Sheets")
                         .HasForeignKey("ServiceId")
@@ -234,6 +283,8 @@ namespace TimeSheets.Migrations
                     b.Navigation("Contract");
 
                     b.Navigation("Employee");
+
+                    b.Navigation("Invoice");
 
                     b.Navigation("Service");
                 });
@@ -245,12 +296,15 @@ namespace TimeSheets.Migrations
 
             modelBuilder.Entity("TimeSheets.Models.Contract", b =>
                 {
-                    b.Navigation("Services");
-
                     b.Navigation("Sheets");
                 });
 
             modelBuilder.Entity("TimeSheets.Models.Employee", b =>
+                {
+                    b.Navigation("Sheets");
+                });
+
+            modelBuilder.Entity("TimeSheets.Models.Invoice", b =>
                 {
                     b.Navigation("Sheets");
                 });
